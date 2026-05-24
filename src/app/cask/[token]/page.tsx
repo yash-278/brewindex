@@ -5,6 +5,7 @@ import { CopyButton } from '@/components/copy-button';
 import { InitialsAvatar } from '@/components/initials-avatar';
 import { formatInstallCount } from '@/lib/format';
 import { DARK_BLUR_DATA_URL } from '@/lib/blur-data-url';
+import { safeExternalUrl } from '@/lib/utils';
 import type { Metadata } from 'next';
 import type { CaskSelectRow } from '@/db/schema';
 
@@ -59,7 +60,9 @@ export default async function CaskPage({
 
   // TypeScript narrowing — cask is guaranteed non-null after notFound() above
   const c = cask as CaskSelectRow;
-  const domain = getDomain(c.homepage);
+  // Validate homepage URL — only allow http:/https: to prevent XSS via javascript: hrefs
+  const safeHomepage = safeExternalUrl(c.homepage);
+  const domain = getDomain(safeHomepage);
 
   return (
     <main
@@ -135,9 +138,9 @@ export default async function CaskPage({
 
           {/* Links row */}
           <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-            {domain && (
+            {domain && safeHomepage && (
               <a
-                href={c.homepage!}
+                href={safeHomepage}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -426,12 +429,12 @@ export default async function CaskPage({
               </span>
               <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
                 <a
-                  href={c.homepage ?? '#'}
+                  href={safeHomepage ?? '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: 'var(--color-primary-hover)' }}
                 >
-                  {getDomain(c.homepage) || c.homepage || '—'}
+                  {domain || safeHomepage || '—'}
                 </a>
               </span>
             </div>
