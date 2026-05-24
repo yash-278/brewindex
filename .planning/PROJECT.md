@@ -12,7 +12,9 @@ A newcomer can discover, understand, and install any macOS app available via Hom
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Cask data is synced from the Homebrew JSON API into a cache layer (not fetched live per request) — *Validated in Phase 01: data-pipeline*
+- [x] User can see install count / popularity ranking — *Validated in Phase 01: data-pipeline (analytics ingested)*
+- [x] User can see GitHub stars, forks, and issues for the upstream repo — *Validated in Phase 01: data-pipeline (GitHub enrichment)*
 
 ### Active
 
@@ -81,4 +83,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after initialization*
+*Last updated: 2026-05-24 after Phase 01 (data-pipeline) completion*
