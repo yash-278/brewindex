@@ -1,9 +1,10 @@
 import type { NextRequest } from 'next/server';
 import { revalidateTag } from 'next/cache';
-import { sql, notInArray } from 'drizzle-orm';
+import { sql, notInArray, eq, isNull } from 'drizzle-orm';
 import { db } from '@/db';
 import { casks } from '@/db/schema';
 import { fetchHomebrewCatalog, fetchHomebrewAnalytics, mapHomebrewCask } from '@/lib/homebrew';
+import { fetchAndStoreIcon } from '@/lib/icons';
 
 export const maxDuration = 800; // Pro plan max — required for full sync
 
@@ -67,9 +68,37 @@ export async function GET(request: NextRequest) {
         .where(notInArray(casks.token, fetchedTokens));
     }
 
+    // Icon pipeline — only process casks where icon_url IS NULL (incremental guard)
+    // This avoids re-uploading all icons on every daily run (~3 min savings)
+    const casksNeedingIcons = await db
+      .select({ token: casks.token, homepage: casks.homepage })
+      .from(casks)
+      .where(isNull(casks.icon_url));
+
+    let uploadCount = 0;
+    let fallbackCount = 0;
+
+    // Process icons with concurrency cap of 10 (chunks of 10 via Promise.all)
+    const ICON_BATCH_SIZE = 10;
+    for (let i = 0; i < casksNeedingIcons.length; i += ICON_BATCH_SIZE) {
+      const group = casksNeedingIcons.slice(i, i + ICON_BATCH_SIZE);
+      await Promise.all(group.map(async (c) => {
+        const { url, isFallback } = await fetchAndStoreIcon(c.token, c.homepage ?? '');
+        await db
+          .update(casks)
+          .set({ icon_url: url, icon_is_fallback: isFallback })
+          .where(eq(casks.token, c.token));
+        if (isFallback) {
+          fallbackCount++;
+        } else {
+          uploadCount++;
+        }
+      }));
+    }
+
     revalidateTag('casks', 'max');
 
-    return new Response(JSON.stringify({ ok: true, synced: rows.length }), {
+    return new Response(JSON.stringify({ ok: true, synced: rows.length, icons_uploaded: uploadCount, icons_fallback: fallbackCount }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
