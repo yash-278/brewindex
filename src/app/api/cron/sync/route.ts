@@ -1,10 +1,11 @@
 import type { NextRequest } from 'next/server';
 import { revalidateTag } from 'next/cache';
-import { sql, notInArray, eq, isNull } from 'drizzle-orm';
+import { sql, notInArray, eq, isNull, like } from 'drizzle-orm';
 import { db } from '@/db';
 import { casks } from '@/db/schema';
 import { fetchHomebrewCatalog, fetchHomebrewAnalytics, mapHomebrewCask } from '@/lib/homebrew';
 import { fetchAndStoreIcon } from '@/lib/icons';
+import { extractGithubRepo, fetchGithubStats } from '@/lib/github';
 
 export const maxDuration = 800; // Pro plan max — required for full sync
 
@@ -96,9 +97,49 @@ export async function GET(request: NextRequest) {
       }));
     }
 
+    // GitHub enrichment — final enrichment step before ISR invalidation
+    // D-02 correction: only 1,083 casks have github.com homepages — single sequential pass,
+    // no sleep loops needed. @octokit/plugin-throttling handles rate limits automatically.
+    const githubCasks = await db
+      .select({ token: casks.token, homepage: casks.homepage })
+      .from(casks)
+      .where(like(casks.homepage, '%github.com%'));
+
+    let githubEnriched = 0;
+    let githubFailed = 0;
+
+    // Sequential loop (NOT Promise.all) to let @octokit/plugin-throttling manage rate limits
+    // T-04-03: throttling plugin handles primary (5K/hr) and secondary (900/min) limits
+    for (const cask of githubCasks) {
+      const parsed = extractGithubRepo(cask.homepage ?? '');
+      // Skip non-repo GitHub URLs (codeql.github.com, docs.github.com) and excluded owners (googlefonts)
+      if (!parsed) continue;
+
+      const stats = await fetchGithubStats(parsed.owner, parsed.repo);
+      if (stats === null) {
+        // D-04: 404 or inaccessible repo — set github_enriched = false, leave stats as NULL
+        await db
+          .update(casks)
+          .set({ github_enriched: false })
+          .where(eq(casks.token, cask.token));
+        githubFailed++;
+      } else {
+        await db
+          .update(casks)
+          .set({
+            github_stars: stats.stars,
+            github_forks: stats.forks,
+            github_issues: stats.issues,
+            github_enriched: true,
+          })
+          .where(eq(casks.token, cask.token));
+        githubEnriched++;
+      }
+    }
+
     revalidateTag('casks', 'max');
 
-    return new Response(JSON.stringify({ ok: true, synced: rows.length, icons_uploaded: uploadCount, icons_fallback: fallbackCount }), {
+    return new Response(JSON.stringify({ ok: true, synced: rows.length, icons_uploaded: uploadCount, icons_fallback: fallbackCount, github_enriched: githubEnriched, github_failed: githubFailed }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
