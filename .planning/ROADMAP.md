@@ -37,7 +37,7 @@ Plans:
 - [x] 01-02-PLAN.md — Full cask sync: homebrew.ts service, 7,659-cask batch upsert, seed script
 - [x] 01-03-PLAN.md — Icon pipeline: DuckDuckGo favicon fetch, Vercel Blob upload, fallback flag
 - [x] 01-04-PLAN.md — GitHub enrichment: throttled Octokit, stats for 1,083 casks, full pipeline complete
-- [ ] 01-05-PLAN.md — Gap closure: complete RFC 1918 SSRF block, all-four-env-var validation, retry cap, icon fault isolation, Fluid Compute opt-in, is_active filters
+- [x] 01-05-PLAN.md — Gap closure: complete RFC 1918 SSRF block, all-four-env-var validation, retry cap, icon fault isolation, Fluid Compute opt-in, is_active filters
 
 ### Phase 2: Catalog UI
 **Goal**: Users can browse the full cask catalog visually and get everything they need to install an app from its detail page
