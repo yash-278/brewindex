@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { revalidateTag } from 'next/cache';
-import { sql, notInArray, eq, isNull, like } from 'drizzle-orm';
+import { sql, notInArray, eq, isNull, like, and } from 'drizzle-orm';
 import { db } from '@/db';
 import { casks } from '@/db/schema';
 import { fetchHomebrewCatalog, fetchHomebrewAnalytics, mapHomebrewCask } from '@/lib/homebrew';
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const missing = ['DATABASE_URL', 'CRON_SECRET']
+  const missing = ['DATABASE_URL', 'CRON_SECRET', 'GITHUB_TOKEN', 'BLOB_READ_WRITE_TOKEN']
     .filter(k => !process.env[k]);
   if (missing.length > 0) {
     return new Response(JSON.stringify({ ok: false, missing }), {
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
     const casksNeedingIcons = await db
       .select({ token: casks.token, homepage: casks.homepage })
       .from(casks)
-      .where(isNull(casks.icon_url));
+      .where(and(isNull(casks.icon_url), eq(casks.is_active, true)));
 
     let uploadCount = 0;
     let fallbackCount = 0;
@@ -84,15 +84,19 @@ export async function GET(request: NextRequest) {
     for (let i = 0; i < casksNeedingIcons.length; i += ICON_BATCH_SIZE) {
       const group = casksNeedingIcons.slice(i, i + ICON_BATCH_SIZE);
       await Promise.all(group.map(async (c) => {
-        const { url, isFallback } = await fetchAndStoreIcon(c.token, c.homepage ?? '');
-        await db
-          .update(casks)
-          .set({ icon_url: url, icon_is_fallback: isFallback })
-          .where(eq(casks.token, c.token));
-        if (isFallback) {
-          fallbackCount++;
-        } else {
-          uploadCount++;
+        try {
+          const { url, isFallback } = await fetchAndStoreIcon(c.token, c.homepage ?? '');
+          await db
+            .update(casks)
+            .set({ icon_url: url, icon_is_fallback: isFallback })
+            .where(eq(casks.token, c.token));
+          if (isFallback) {
+            fallbackCount++;
+          } else {
+            uploadCount++;
+          }
+        } catch (err) {
+          console.warn('[cron/sync] icon failed for', c.token, err);
         }
       }));
     }
@@ -103,7 +107,7 @@ export async function GET(request: NextRequest) {
     const githubCasks = await db
       .select({ token: casks.token, homepage: casks.homepage })
       .from(casks)
-      .where(like(casks.homepage, '%github.com%'));
+      .where(and(like(casks.homepage, '%github.com%'), eq(casks.is_active, true)));
 
     let githubEnriched = 0;
     let githubFailed = 0;
