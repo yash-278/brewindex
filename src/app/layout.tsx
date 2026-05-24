@@ -24,7 +24,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const caskCount = await getCasksCount();
+  let caskCount = 0;
+  try {
+    caskCount = await getCasksCount();
+  } catch {
+    // DB unavailable (cold-start, quota, network) — render without count
+    // rather than crashing all pages. The header treats 0 as a loading state.
+  }
 
   return (
     <html
