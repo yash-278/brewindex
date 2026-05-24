@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "db:generate": "drizzle-kit generate:pg",
     "seed": "npx tsx scripts/seed.ts"
   },
   "dependencies": {
