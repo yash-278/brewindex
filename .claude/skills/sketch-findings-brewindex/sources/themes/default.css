@@ -1,0 +1,59 @@
+:root {
+  /* Raycast-inspired dark developer palette */
+  --color-bg: #0e0e0e;
+  --color-surface: #1a1a1a;
+  --color-surface-hover: #222222;
+  --color-surface-raised: #242424;
+  --color-border: #2a2a2a;
+  --color-border-subtle: #1f1f1f;
+
+  --color-text: #f0f0f0;
+  --color-text-muted: #888888;
+  --color-text-faint: #555555;
+
+  /* Vibrant accent — Raycast uses a warm gradient; we use a single electric blue-violet */
+  --color-primary: #7c6aff;
+  --color-primary-hover: #9581ff;
+  --color-primary-dim: rgba(124, 106, 255, 0.15);
+
+  --color-accent: #ff6b6b;
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Shapes */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 0 1px rgba(124, 106, 255, 0.3), 0 4px 12px rgba(124, 106, 255, 0.15);
+}
