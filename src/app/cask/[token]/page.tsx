@@ -27,8 +27,8 @@ export async function generateMetadata({
 }
 
 /** Returns a relative date string like "3 days ago", "2 months ago", "1 year ago". */
-function formatRelativeDate(date: Date): string {
-  const diffMs = Date.now() - date.getTime();
+function formatRelativeDate(date: Date | string): string {
+  const diffMs = Date.now() - new Date(date).getTime();
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   if (days < 1) return 'today';
   if (days < 30) return `${days} ${days === 1 ? 'day' : 'days'} ago`;
@@ -402,7 +402,7 @@ export default async function CaskPage({
                 Updated
               </span>
               <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-                {c.last_synced_at.toLocaleDateString('en-US', {
+                {new Date(c.last_synced_at).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',
