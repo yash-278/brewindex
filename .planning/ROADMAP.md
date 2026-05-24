@@ -30,13 +30,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Casks with a GitHub upstream repo (excluding Google Font packs) have stars, forks, and open issue counts stored in the database
   4. Calling the cron endpoint without a valid Bearer token returns 401 and performs no work
   5. All server-side HTTP calls in the sync job are restricted to the explicit allowlist (formulae.brew.sh, api.github.com, Blob storage); any off-allowlist URL is blocked at the fetch wrapper
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
 - [x] 01-01-PLAN.md — Walking skeleton: scaffold, Drizzle schema, SSRF wrapper, cron auth guard, one-cask proof
 - [x] 01-02-PLAN.md — Full cask sync: homebrew.ts service, 7,659-cask batch upsert, seed script
 - [x] 01-03-PLAN.md — Icon pipeline: DuckDuckGo favicon fetch, Vercel Blob upload, fallback flag
 - [x] 01-04-PLAN.md — GitHub enrichment: throttled Octokit, stats for 1,083 casks, full pipeline complete
+- [ ] 01-05-PLAN.md — Gap closure: complete RFC 1918 SSRF block, all-four-env-var validation, retry cap, icon fault isolation, Fluid Compute opt-in, is_active filters
 
 ### Phase 2: Catalog UI
 **Goal**: Users can browse the full cask catalog visually and get everything they need to install an app from its detail page
@@ -82,7 +83,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Pipeline | 0/4 | Not started | - |
+| 1. Data Pipeline | 0/5 | Not started | - |
 | 2. Catalog UI | 0/? | Not started | - |
 | 3. Search + Security | 0/? | Not started | - |
 | 4. Discovery Layer | 0/? | Not started | - |
