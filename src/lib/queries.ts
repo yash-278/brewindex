@@ -3,16 +3,19 @@ import { db } from '@/db';
 import { casks } from '@/db/schema';
 import { and, desc, eq, sql } from 'drizzle-orm';
 
+/** Number of casks per page — single source of truth shared with browse/page.tsx. */
+export const PAGE_SIZE = 48;
+
 /** Returns a page of active casks ordered by 365-day install count descending. */
 export const getCasksPage = unstable_cache(
   async (page: number) => {
-    const offset = (page - 1) * 48;
+    const offset = (page - 1) * PAGE_SIZE;
     return db
       .select()
       .from(casks)
       .where(eq(casks.is_active, true))
       .orderBy(desc(casks.install_365d))
-      .limit(48)
+      .limit(PAGE_SIZE)
       .offset(offset);
   },
   ['casks-page'],

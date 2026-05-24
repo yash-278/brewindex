@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getCasksPage, getCasksCount } from '@/lib/queries';
+import { getCasksPage, getCasksCount, PAGE_SIZE } from '@/lib/queries';
 import { CaskGrid } from '@/components/cask-grid';
 import { Pagination } from '@/components/pagination';
 
@@ -16,7 +16,7 @@ export default async function BrowsePage({
 
   const [pageCasks, totalCount] = await Promise.all([getCasksPage(page), getCasksCount()]);
 
-  const totalPages = Math.ceil(totalCount / 48);
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   if (page > totalPages && totalPages > 0) {
     redirect('/browse?page=' + totalPages);
