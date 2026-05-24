@@ -1,19 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export function CopyButton({ token }: { token: string }) {
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   async function handleCopy() {
+    if (timerRef.current) clearTimeout(timerRef.current);
     try {
       await navigator.clipboard.writeText('brew install --cask ' + token);
       setState('copied');
-      setTimeout(() => setState('idle'), 2000);
     } catch {
       setState('failed');
-      setTimeout(() => setState('idle'), 2000);
     }
+    timerRef.current = setTimeout(() => setState('idle'), 2000);
   }
 
   const label =
