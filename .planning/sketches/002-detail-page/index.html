@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrewIndex — Sketch 002: Detail Page</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    padding-top: 44px;
+  }
+
+  /* ── Variant nav ─────────────────────────────────────── */
+  #variant-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+    background: #111111;
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 16px;
+    display: flex; align-items: center; gap: 4px;
+    height: 44px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+  }
+  .vn-label {
+    color: var(--color-text-faint); font-size: 11px;
+    margin-right: 8px; letter-spacing: 0.06em;
+    text-transform: uppercase; white-space: nowrap;
+  }
+  .variant-tab {
+    background: transparent; border: 1px solid transparent;
+    border-radius: var(--radius-sm); color: var(--color-text-muted);
+    cursor: pointer; font-size: 12px; font-family: var(--font-sans);
+    padding: 5px 12px; transition: all 0.15s ease; white-space: nowrap;
+  }
+  .variant-tab:hover { color: var(--color-text); background: var(--color-surface); }
+  .variant-tab.active {
+    background: var(--color-primary-dim);
+    border-color: rgba(124,106,255,0.35);
+    color: var(--color-primary-hover);
+  }
+  .vn-spacer { flex: 1; }
+
+  /* ── Shared shell ─────────────────────────────────────── */
+  .shell-header {
+    height: 56px; border-bottom: 1px solid var(--color-border);
+    display: flex; align-items: center;
+    padding: 0 24px; gap: 16px;
+    background: var(--color-bg);
+    position: sticky; top: 44px; z-index: 100;
+  }
+  .logo {
+    font-size: 16px; font-weight: 700; color: var(--color-text);
+    letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px;
+  }
+  .logo-icon {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--color-primary), #c084fc);
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .search-bar {
+    flex: 1; max-width: 480px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius-md); padding: 7px 12px;
+    cursor: not-allowed; opacity: 0.55;
+  }
+  .search-icon { color: var(--color-text-faint); font-size: 13px; }
+  .search-hint { color: var(--color-text-faint); font-size: var(--text-sm); }
+  .breadcrumb {
+    display: flex; align-items: center; gap: 6px;
+    font-size: var(--text-sm); color: var(--color-text-muted);
+    margin-left: auto;
+  }
+  .breadcrumb a { color: var(--color-text-muted); text-decoration: none; cursor: pointer; }
+  .breadcrumb a:hover { color: var(--color-primary-hover); }
+  .breadcrumb-sep { color: var(--color-text-faint); }
+
+  /* ── Shared: install command block ───────────────────── */
+  .install-block {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .install-cmd {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+  .install-cmd .cmd-prefix { color: var(--color-text-faint); }
+  .install-cmd .cmd-cask { color: var(--color-primary-hover); }
+  .copy-btn {
+    background: var(--color-primary);
+    border: none; border-radius: var(--radius-sm);
+    color: white; cursor: pointer;
+    font-size: var(--text-sm); font-family: var(--font-sans);
+    font-weight: 500;
+    padding: 7px 16px;
+    transition: all 0.15s ease;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .copy-btn:hover { background: var(--color-primary-hover); transform: translateY(-1px); }
+  .copy-btn.copied {
+    background: var(--color-success);
+    color: #0a0a0a;
+  }
+
+  /* ── Shared: stat pill ───────────────────────────────── */
+  .stat-group { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+  .stat-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+    display: flex; flex-direction: column; gap: 2px;
+    min-width: 110px;
+  }
+  .stat-label { font-size: var(--text-xs); color: var(--color-text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-value { font-size: var(--text-xl); font-weight: 700; color: var(--color-text); letter-spacing: -0.02em; }
+  .stat-value.accent { color: var(--color-primary-hover); }
+
+  /* ── Shared: metadata table ──────────────────────────── */
+  .meta-list { display: flex; flex-direction: column; gap: 10px; }
+  .meta-row { display: flex; gap: 12px; align-items: baseline; }
+  .meta-key {
+    font-size: var(--text-xs); color: var(--color-text-faint);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    width: 80px; flex-shrink: 0;
+  }
+  .meta-val { font-size: var(--text-sm); color: var(--color-text-muted); }
+  .meta-val a { color: var(--color-primary-hover); text-decoration: none; }
+  .meta-val a:hover { text-decoration: underline; }
+  .meta-val code {
+    font-family: var(--font-mono); font-size: 11px;
+    background: var(--color-bg); border: 1px solid var(--color-border);
+    border-radius: 3px; padding: 1px 5px; color: var(--color-text-muted);
+  }
+
+  /* ── Shared: section label ───────────────────────────── */
+  .section-label {
+    font-size: var(--text-xs); color: var(--color-text-faint);
+    text-transform: uppercase; letter-spacing: 0.07em;
+    font-weight: 500; margin-bottom: var(--space-3);
+  }
+
+  /* ── Shared: page wrap ───────────────────────────────── */
+  .page-wrap { max-width: 1100px; margin: 0 auto; padding: var(--space-8) var(--space-6); }
+
+  /* ══════════════════════════════════════════════════════
+     VARIANT A — Hero Header
+     Full-width banner with icon + name + desc,
+     install command prominent below, stats + meta below that
+  ══════════════════════════════════════════════════════ */
+
+  #variant-a .hero {
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-10) 0 var(--space-8);
+    display: flex; align-items: flex-start; gap: var(--space-6);
+  }
+  #variant-a .hero-icon {
+    width: 80px; height: 80px; flex-shrink: 0;
+    border-radius: var(--radius-xl);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; font-weight: 700; color: white;
+  }
+  #variant-a .hero-body { flex: 1; min-width: 0; }
+  #variant-a .hero-name {
+    font-size: var(--text-3xl); font-weight: 700;
+    color: var(--color-text); letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  #variant-a .hero-version {
+    font-size: var(--text-sm); color: var(--color-text-faint);
+    font-family: var(--font-mono); margin-top: 4px;
+  }
+  #variant-a .hero-desc {
+    font-size: var(--text-base); color: var(--color-text-muted);
+    margin-top: var(--space-3); max-width: 640px; line-height: 1.6;
+  }
+  #variant-a .hero-links {
+    display: flex; gap: var(--space-3); margin-top: var(--space-4);
+    align-items: center;
+  }
+  #variant-a .link-btn {
+    font-size: var(--text-sm); color: var(--color-text-muted);
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm); padding: 5px 12px;
+    text-decoration: none; cursor: pointer; transition: all 0.15s ease;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  #variant-a .link-btn:hover { border-color: var(--color-primary); color: var(--color-primary-hover); }
+
+  #variant-a .below-hero { padding-top: var(--space-8); display: flex; flex-direction: column; gap: var(--space-8); }
+
+  #variant-a .install-section { max-width: 640px; }
+
+  #variant-a .stats-meta { display: flex; gap: var(--space-8); flex-wrap: wrap; }
+  #variant-a .stats-col { flex: 1; min-width: 280px; }
+
+  /* ══════════════════════════════════════════════════════
+     VARIANT B — Two-Column Layout
+     Left sidebar: icon + meta + links
+     Right main: name, desc, install command, stats
+  ══════════════════════════════════════════════════════ */
+
+  #variant-b .two-col {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: var(--space-10);
+    padding-top: var(--space-8);
+  }
+
+  #variant-b .sidebar {
+    display: flex; flex-direction: column; gap: var(--space-6);
+  }
+  #variant-b .sidebar-icon {
+    width: 96px; height: 96px;
+    border-radius: var(--radius-xl);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 700; color: white;
+  }
+  #variant-b .sidebar-name {
+    font-size: var(--text-xl); font-weight: 700;
+    color: var(--color-text); letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  #variant-b .sidebar-version {
+    font-size: var(--text-xs); color: var(--color-text-faint);
+    font-family: var(--font-mono); margin-top: 2px;
+  }
+  #variant-b .sidebar-link {
+    display: flex; align-items: center; gap: 6px;
+    font-size: var(--text-sm); color: var(--color-primary-hover);
+    text-decoration: none; cursor: pointer;
+  }
+  #variant-b .sidebar-link:hover { text-decoration: underline; }
+
+  #variant-b .main-col { display: flex; flex-direction: column; gap: var(--space-8); }
+  #variant-b .main-desc {
+    font-size: var(--text-lg); color: var(--color-text-muted);
+    line-height: 1.65; max-width: 600px;
+  }
+  #variant-b .main-section { display: flex; flex-direction: column; gap: var(--space-3); }
+
+  /* ══════════════════════════════════════════════════════
+     VARIANT C — Single-Column Editorial
+     Everything stacked in one narrow column, like a
+     well-formatted README or app landing page
+  ══════════════════════════════════════════════════════ */
+
+  #variant-c .editorial {
+    max-width: 720px; margin: 0 auto;
+    padding-top: var(--space-10);
+    display: flex; flex-direction: column; gap: var(--space-8);
+  }
+
+  #variant-c .app-header {
+    display: flex; align-items: center; gap: var(--space-5);
+  }
+  #variant-c .app-icon {
+    width: 72px; height: 72px; flex-shrink: 0;
+    border-radius: var(--radius-xl);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700; color: white;
+  }
+  #variant-c .app-title-block {}
+  #variant-c .app-name {
+    font-size: var(--text-2xl); font-weight: 700;
+    color: var(--color-text); letter-spacing: -0.02em;
+  }
+  #variant-c .app-meta-inline {
+    display: flex; gap: var(--space-3); margin-top: 4px; align-items: center;
+  }
+  #variant-c .tag {
+    font-size: var(--text-xs); padding: 2px 8px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted); background: var(--color-surface);
+  }
+  #variant-c .tag.version { font-family: var(--font-mono); }
+
+  #variant-c .app-desc {
+    font-size: var(--text-base); color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  #variant-c .divider {
+    border: none; border-top: 1px solid var(--color-border);
+    margin: 0;
+  }
+
+  #variant-c .stats-row {
+    display: flex; gap: var(--space-6); flex-wrap: wrap;
+  }
+  #variant-c .stat-inline {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  #variant-c .stat-inline .stat-value {
+    font-size: var(--text-2xl); font-weight: 700;
+    color: var(--color-text); letter-spacing: -0.02em;
+  }
+  #variant-c .stat-inline .stat-label {
+    font-size: var(--text-xs); color: var(--color-text-faint);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  #variant-c .homepage-row {
+    display: flex; align-items: center; gap: var(--space-3);
+  }
+  #variant-c .homepage-link {
+    font-size: var(--text-sm); color: var(--color-primary-hover);
+    text-decoration: none; display: flex; align-items: center; gap: 4px;
+  }
+  #variant-c .homepage-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- ── Variant nav ───────────────────────────────────── -->
+<div id="variant-nav">
+  <span class="vn-label">Sketch 002</span>
+  <button class="variant-tab active" onclick="showVariant('a', this)">A: Hero Header ★ Selected</button>
+  <button class="variant-tab" onclick="showVariant('b', this)">B: Two-Column Sidebar</button>
+  <button class="variant-tab" onclick="showVariant('c', this)">C: Single-Column Editorial</button>
+  <span class="vn-spacer"></span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VARIANT A — Hero Header
+══════════════════════════════════════════════════════ -->
+<div id="variant-a" class="variant active">
+  <header class="shell-header">
+    <div class="logo"><div class="logo-icon">🍺</div>BrewIndex</div>
+    <div class="search-bar">
+      <span class="search-icon">⌕</span>
+      <span class="search-hint">Search casks…</span>
+    </div>
+    <nav class="breadcrumb">
+      <a onclick="">Browse</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Visual Studio Code</span>
+    </nav>
+  </header>
+
+  <div class="page-wrap">
+    <div class="hero">
+      <div class="hero-icon" style="background:#007ACC;">VS</div>
+      <div class="hero-body">
+        <div class="hero-name">Visual Studio Code</div>
+        <div class="hero-version">v1.87.2 · Last updated 3 days ago</div>
+        <div class="hero-desc">Code editor redefined and optimized for building and debugging modern web and cloud applications. Built on Electron with a powerful extension ecosystem.</div>
+        <div class="hero-links">
+          <a class="link-btn" onclick="">↗ code.visualstudio.com</a>
+          <a class="link-btn" onclick="">⭐ github.com/microsoft/vscode</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="below-hero">
+      <!-- Install command -->
+      <div class="install-section">
+        <div class="section-label">Install</div>
+        <div class="install-block">
+          <div class="install-cmd">
+            <span class="cmd-prefix">brew install --cask </span><span class="cmd-cask">visual-studio-code</span>
+          </div>
+          <button class="copy-btn" onclick="doCopy(this)">Copy</button>
+        </div>
+      </div>
+
+      <!-- Stats + Meta side by side -->
+      <div class="stats-meta">
+        <div class="stats-col">
+          <div class="section-label">Install Stats</div>
+          <div class="stat-group">
+            <div class="stat-card">
+              <div class="stat-label">30 days</div>
+              <div class="stat-value accent">421K</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">90 days</div>
+              <div class="stat-value">1.2M</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">365 days</div>
+              <div class="stat-value">4.8M</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-col">
+          <div class="section-label">Details</div>
+          <div class="meta-list">
+            <div class="meta-row"><span class="meta-key">Token</span><span class="meta-val"><code>visual-studio-code</code></span></div>
+            <div class="meta-row"><span class="meta-key">Version</span><span class="meta-val">1.87.2</span></div>
+            <div class="meta-row"><span class="meta-key">Platform</span><span class="meta-val">macOS 11.0+</span></div>
+            <div class="meta-row"><span class="meta-key">Updated</span><span class="meta-val">May 21, 2026</span></div>
+            <div class="meta-row"><span class="meta-key">Homepage</span><span class="meta-val"><a onclick="">code.visualstudio.com ↗</a></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VARIANT B — Two-Column Sidebar
+══════════════════════════════════════════════════════ -->
+<div id="variant-b" class="variant" style="display:none">
+  <header class="shell-header">
+    <div class="logo"><div class="logo-icon">🍺</div>BrewIndex</div>
+    <div class="search-bar">
+      <span class="search-icon">⌕</span>
+      <span class="search-hint">Search casks…</span>
+    </div>
+    <nav class="breadcrumb">
+      <a onclick="">Browse</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Visual Studio Code</span>
+    </nav>
+  </header>
+
+  <div class="page-wrap">
+    <div class="two-col">
+      <!-- Left sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-icon" style="background:#007ACC;">VS</div>
+        <div>
+          <div class="sidebar-name">Visual Studio Code</div>
+          <div class="sidebar-version">v1.87.2</div>
+        </div>
+        <div class="meta-list">
+          <div class="meta-row"><span class="meta-key">Token</span><span class="meta-val"><code>visual-studio-code</code></span></div>
+          <div class="meta-row"><span class="meta-key">Platform</span><span class="meta-val">macOS 11.0+</span></div>
+          <div class="meta-row"><span class="meta-key">Updated</span><span class="meta-val">May 21, 2026</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a class="sidebar-link" onclick="">↗ code.visualstudio.com</a>
+          <a class="sidebar-link" onclick="">⭐ github.com/microsoft/vscode</a>
+        </div>
+      </div>
+
+      <!-- Right main content -->
+      <div class="main-col">
+        <div class="main-desc">Code editor redefined and optimized for building and debugging modern web and cloud applications. Built on Electron with a powerful extension ecosystem.</div>
+
+        <div class="main-section">
+          <div class="section-label">Install</div>
+          <div class="install-block">
+            <div class="install-cmd">
+              <span class="cmd-prefix">brew install --cask </span><span class="cmd-cask">visual-studio-code</span>
+            </div>
+            <button class="copy-btn" onclick="doCopy(this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="main-section">
+          <div class="section-label">Install Stats</div>
+          <div class="stat-group">
+            <div class="stat-card">
+              <div class="stat-label">30 days</div>
+              <div class="stat-value accent">421K</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">90 days</div>
+              <div class="stat-value">1.2M</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">365 days</div>
+              <div class="stat-value">4.8M</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     VARIANT C — Single-Column Editorial
+══════════════════════════════════════════════════════ -->
+<div id="variant-c" class="variant" style="display:none">
+  <header class="shell-header">
+    <div class="logo"><div class="logo-icon">🍺</div>BrewIndex</div>
+    <div class="search-bar">
+      <span class="search-icon">⌕</span>
+      <span class="search-hint">Search casks…</span>
+    </div>
+    <nav class="breadcrumb">
+      <a onclick="">Browse</a>
+      <span class="breadcrumb-sep">/</span>
+      <span>Visual Studio Code</span>
+    </nav>
+  </header>
+
+  <div class="page-wrap">
+    <div class="editorial">
+      <!-- App header -->
+      <div class="app-header">
+        <div class="app-icon" style="background:#007ACC;">VS</div>
+        <div class="app-title-block">
+          <div class="app-name">Visual Studio Code</div>
+          <div class="app-meta-inline">
+            <span class="tag version">v1.87.2</span>
+            <span class="tag">macOS 11+</span>
+            <span class="tag">Updated 3 days ago</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="app-desc">Code editor redefined and optimized for building and debugging modern web and cloud applications. Built on Electron with a powerful extension ecosystem and deep Git integration.</div>
+
+      <hr class="divider">
+
+      <!-- Install command -->
+      <div>
+        <div class="section-label">Install</div>
+        <div class="install-block">
+          <div class="install-cmd">
+            <span class="cmd-prefix">brew install --cask </span><span class="cmd-cask">visual-studio-code</span>
+          </div>
+          <button class="copy-btn" onclick="doCopy(this)">Copy</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div>
+        <div class="section-label">Installs</div>
+        <div class="stats-row">
+          <div class="stat-inline">
+            <div class="stat-value" style="color:var(--color-primary-hover)">421K</div>
+            <div class="stat-label">Last 30 days</div>
+          </div>
+          <div class="stat-inline">
+            <div class="stat-value">1.2M</div>
+            <div class="stat-label">Last 90 days</div>
+          </div>
+          <div class="stat-inline">
+            <div class="stat-value">4.8M</div>
+            <div class="stat-label">Last 365 days</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Metadata -->
+      <div>
+        <div class="section-label">Details</div>
+        <div class="meta-list">
+          <div class="meta-row"><span class="meta-key">Token</span><span class="meta-val"><code>visual-studio-code</code></span></div>
+          <div class="meta-row"><span class="meta-key">Version</span><span class="meta-val">1.87.2</span></div>
+          <div class="meta-row"><span class="meta-key">Updated</span><span class="meta-val">May 21, 2026</span></div>
+          <div class="meta-row"><span class="meta-key">Homepage</span><span class="meta-val"><a onclick="">code.visualstudio.com ↗</a></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Sketch toolbar ─────────────────────────────────── -->
+<div id="sketch-tools" style="position:fixed;bottom:12px;right:12px;z-index:9999;font-family:system-ui;font-size:12px;background:rgba(0,0,0,0.75);color:white;padding:8px 12px;border-radius:8px;opacity:0.35;transition:opacity 0.2s;display:flex;align-items:center;gap:10px;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.35'">
+  <span style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Theme</span>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'" style="background:#2a2a2a;color:white;border:1px solid #444;border-radius:4px;padding:2px 6px;font-size:11px;">
+    <option value="default">Default</option>
+  </select>
+  <span style="color:#555">|</span>
+  <span style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Width</span>
+  <button onclick="setWidth(375)" style="background:#333;color:#ccc;border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:11px;">375</button>
+  <button onclick="setWidth(768)" style="background:#333;color:#ccc;border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:11px;">768</button>
+  <button onclick="setWidth(null)" style="background:#333;color:#ccc;border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:11px;">Full</button>
+</div>
+
+<script>
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('variant-' + id).style.display = 'block';
+  (btn || document.querySelector(`[onclick*="'${id}'"]`)).classList.add('active');
+}
+
+function doCopy(btn) {
+  const orig = btn.textContent;
+  btn.textContent = 'Copied!';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+}
+
+function setWidth(w) {
+  document.querySelectorAll('.page-wrap').forEach(el => {
+    el.style.maxWidth = w ? w + 'px' : '1100px';
+    el.style.padding = w && w <= 375 ? '16px' : '32px 24px';
+  });
+}
+</script>
+</body>
+</html>

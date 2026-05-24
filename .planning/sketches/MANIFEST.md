@@ -14,3 +14,4 @@ Dark, developer-first aesthetic inspired by Raycast: near-black background (`#0e
 | # | Name | Design Question | Winner | Tags |
 |---|------|----------------|--------|------|
 | 001 | browse-grid | How should the card balance icon, name, and description? | D — Tall Horizontal | layout, browse, card, grid |
+| 002 | detail-page | How are install command, stats, and metadata arranged? | A — Hero Header | layout, detail, install-command, stats |
