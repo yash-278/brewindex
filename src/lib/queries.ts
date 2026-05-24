@@ -26,7 +26,7 @@ export const getCasksCount = unstable_cache(
       .select({ count: sql<number>`count(*)::int` })
       .from(casks)
       .where(eq(casks.is_active, true));
-    return result[0].count;
+    return result[0]?.count ?? 0;
   },
   ['casks-count'],
   { tags: ['casks'] }
