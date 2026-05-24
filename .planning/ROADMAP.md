@@ -36,7 +36,7 @@ Plans:
 - [x] 01-01-PLAN.md — Walking skeleton: scaffold, Drizzle schema, SSRF wrapper, cron auth guard, one-cask proof
 - [x] 01-02-PLAN.md — Full cask sync: homebrew.ts service, 7,659-cask batch upsert, seed script
 - [x] 01-03-PLAN.md — Icon pipeline: DuckDuckGo favicon fetch, Vercel Blob upload, fallback flag
-- [ ] 01-04-PLAN.md — GitHub enrichment: throttled Octokit, stats for 1,083 casks, full pipeline complete
+- [x] 01-04-PLAN.md — GitHub enrichment: throttled Octokit, stats for 1,083 casks, full pipeline complete
 
 ### Phase 2: Catalog UI
 **Goal**: Users can browse the full cask catalog visually and get everything they need to install an app from its detail page
