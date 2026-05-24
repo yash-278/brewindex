@@ -50,8 +50,12 @@ Plans:
   3. Clicking a cask opens a detail page showing name, icon, description, current version, last-updated date, homepage link, and 30d/90d/365d install counts
   4. A single click on the detail page copies `brew install --cask <token>` to the clipboard with visible confirmation feedback
   5. The top-500 detail pages (by install count) are pre-rendered at build time; the remaining pages render on-demand and cache via ISR
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Foundation: shadcn init, design tokens (globals.css), next/image config, lib utilities (queries, format, hash, blur-data-url)
+- [ ] 02-02-PLAN.md — Browse slice: root redirect, header, CaskCard, CaskGrid, Pagination, browse page assembly (BRWS-01, BRWS-04)
+- [ ] 02-03-PLAN.md — Detail slice: CopyButton client island, detail page hero/install/stats/metadata, generateStaticParams top-500, not-found state (DETL-01–04)
 
 ### Phase 3: Search + Security
 **Goal**: Users can find specific casks by name and filter by platform, and the public API surface is protected against abuse
@@ -84,6 +88,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Pipeline | 0/5 | Not started | - |
-| 2. Catalog UI | 0/? | Not started | - |
+| 2. Catalog UI | 0/3 | Not started | - |
 | 3. Search + Security | 0/? | Not started | - |
 | 4. Discovery Layer | 0/? | Not started | - |
