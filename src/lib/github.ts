@@ -14,8 +14,8 @@ export const octokit = new ThrottledOctokit({
     onRateLimit: (retryAfter: number, options: unknown, _octokit: Octokit, retryCount: number) => {
       if (retryCount < 2) return true; // retry twice before giving up on primary rate limit
     },
-    onSecondaryRateLimit: (_retryAfter: number, _options: unknown, _octokit: Octokit) => {
-      return true; // always retry secondary rate limits (abuse detection)
+    onSecondaryRateLimit: (_retryAfter: number, _options: unknown, _octokit: Octokit, retryCount: number) => {
+      return retryCount < 2; // cap secondary rate limit retries at 2 (mirrors onRateLimit)
     },
   },
 });
