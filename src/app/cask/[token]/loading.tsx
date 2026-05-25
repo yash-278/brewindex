@@ -4,12 +4,12 @@ export default function CaskLoading() {
       className="animate-pulse"
       style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px 48px' }}
     >
-      {/* Back nav skeleton */}
+      {/* Back nav skeleton — matches inline-flex link: padding:6px 10px, fontSize:0.8125rem → ~31px */}
       <div style={{ paddingTop: '20px' }}>
         <div
           style={{
-            height: 30,
-            width: 120,
+            height: 31,
+            width: 130,
             borderRadius: 6,
             background: 'var(--color-border)',
           }}
@@ -37,53 +37,54 @@ export default function CaskLoading() {
           }}
         />
 
-        {/* Hero body */}
+        {/* Hero body — matches page.tsx: flex column, no gap, margin-based spacing */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '12px',
-            flex: 1,
-            paddingTop: '4px',
+            minWidth: 0,
           }}
         >
-          {/* h1 skeleton */}
+          {/* h1 — fontSize:2rem lineHeight:1.1 → ~35px */}
           <div
             style={{
-              height: 36,
+              height: 35,
               width: '40%',
               borderRadius: 6,
               background: 'var(--color-border)',
             }}
           />
 
-          {/* Version/date line */}
+          {/* Version/date line — fontSize:0.6875rem, marginTop:4px → 11px */}
           <div
             style={{
-              height: 12,
+              height: 11,
               width: '30%',
               borderRadius: 4,
               background: 'var(--color-border)',
+              marginTop: '4px',
             }}
           />
 
-          {/* Description line 1 */}
+          {/* Description — fontSize:1rem lineHeight:1.5 ~2 lines → ~48px, marginTop:12px */}
           <div
             style={{
-              height: 16,
+              height: 48,
               width: '80%',
               borderRadius: 4,
               background: 'var(--color-border)',
+              marginTop: '12px',
             }}
           />
 
-          {/* Description line 2 */}
+          {/* Links row placeholder — marginTop:16px, height matches link button */}
           <div
             style={{
-              height: 16,
-              width: '65%',
-              borderRadius: 4,
+              height: 29,
+              width: 100,
+              borderRadius: 6,
               background: 'var(--color-border)',
+              marginTop: '16px',
             }}
           />
         </div>
@@ -102,10 +103,10 @@ export default function CaskLoading() {
           }}
         />
 
-        {/* Code block */}
+        {/* Code block — padding:12px 16px + fontSize:0.8125rem lineHeight:1.5 → ~43px */}
         <div
           style={{
-            height: 48,
+            height: 43,
             maxWidth: 640,
             borderRadius: 10,
             background: 'var(--color-border)',

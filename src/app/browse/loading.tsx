@@ -8,6 +8,7 @@ export default function BrowseLoading() {
             className="animate-pulse"
             style={{
               display: 'flex',
+              alignItems: 'flex-start',
               gap: '16px',
               padding: '20px',
               background: 'var(--color-surface)',
@@ -15,7 +16,7 @@ export default function BrowseLoading() {
               borderRadius: '14px',
             }}
           >
-            {/* Icon skeleton */}
+            {/* Icon skeleton — matches CaskIcon size={52} */}
             <div
               style={{
                 width: 52,
@@ -37,52 +38,67 @@ export default function BrowseLoading() {
                 gap: '8px',
               }}
             >
-              {/* Name line */}
-              <div
-                style={{
-                  height: 16,
-                  borderRadius: 4,
-                  background: 'var(--color-border)',
-                  width: '55%',
-                }}
-              />
+              {/* Name + version row — fontSize:1rem fontWeight:700, lineHeight ~1.5 → 24px */}
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div
+                  style={{
+                    height: 24,
+                    borderRadius: 4,
+                    background: 'var(--color-border)',
+                    flex: 1,
+                    maxWidth: '55%',
+                  }}
+                />
+                <div
+                  style={{
+                    height: 11,
+                    width: 36,
+                    borderRadius: 4,
+                    background: 'var(--color-border)',
+                    flexShrink: 0,
+                    marginLeft: 'auto',
+                  }}
+                />
+              </div>
 
-              {/* Description line 1 */}
+              {/* Description — <p> at 0.8125rem × lineHeight 1.5 × 2 lines → ~39px */}
               <div
                 style={{
-                  height: 13,
+                  height: 39,
                   borderRadius: 4,
                   background: 'var(--color-border)',
                   width: '90%',
                 }}
               />
 
-              {/* Description line 2 */}
-              <div
-                style={{
-                  height: 13,
-                  borderRadius: 4,
-                  background: 'var(--color-border)',
-                  width: '70%',
-                }}
-              />
-
-              {/* Metadata strip */}
-              <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+              {/* Metadata strip — gap:12px matching CaskCard */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: 4 }}>
+                {/* Installs pill — padding:2px 8px + fontSize:0.6875rem + border → ~22px */}
                 <div
                   style={{
-                    height: 18,
-                    width: 72,
+                    height: 22,
+                    width: 80,
                     borderRadius: 9999,
                     background: 'var(--color-border)',
                   }}
                 />
+                {/* Platform pill */}
                 <div
                   style={{
-                    height: 18,
+                    height: 22,
                     width: 52,
                     borderRadius: 9999,
                     background: 'var(--color-border)',
+                  }}
+                />
+                {/* Token — marginLeft:auto */}
+                <div
+                  style={{
+                    height: 11,
+                    width: 60,
+                    borderRadius: 4,
+                    background: 'var(--color-border)',
+                    marginLeft: 'auto',
                   }}
                 />
               </div>
