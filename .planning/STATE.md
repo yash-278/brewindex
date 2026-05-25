@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: context exhaustion at 75% (2026-05-25)
-last_updated: "2026-05-25T08:26:36.637Z"
-last_activity: 2026-05-25 -- Phase 05 execution started
+stopped_at: Phase 05.1 complete
+last_updated: "2026-05-25T10:30:00.000Z"
+last_activity: 2026-05-25 -- Phase 05.1 Plan 01 complete (icons loading from Tigris)
 progress:
-  total_phases: 5
-  completed_phases: 3
-  total_plans: 12
-  completed_plans: 12
-  percent: 60
+  total_phases: 6
+  completed_phases: 4
+  total_plans: 13
+  completed_plans: 13
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** A newcomer can discover, understand, and install any macOS app available via Homebrew without ever needing to know the CLI exists.
-**Current focus:** Phase 05 — railway-migration
+**Current focus:** Phase 05.1 — icon-storage-migration
 
 ## Current Position
 
-Phase: 05 (railway-migration) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 05
-Last activity: 2026-05-25 -- Phase 05 execution started
+Phase: 05.1 (icon-storage-migration) — COMPLETE
+Plan: 1 of 1 (complete)
+Status: Phase 05.1 complete — all plans done
+Last activity: 2026-05-25 -- Phase 05.1 Plan 01 complete (icons loading from Tigris)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -62,7 +62,7 @@ Recent decisions affecting current work:
 
 - Roadmap: 4 coarse phases; data pipeline first, discovery layer last
 - Stack: Next.js App Router + Neon Postgres + Drizzle + Upstash Redis + shadcn/ui + Tailwind v4
-- Icons: Fetch from homepage domain favicon at sync time → Vercel Blob (no hotlinking)
+- Icons: Fetch from homepage domain favicon at sync time → Tigris S3 bucket via @aws-sdk/client-s3 (migrated from Vercel Blob in Phase 05.1)
 - ISR: revalidateTag('casks') post-sync, not time-based TTL; top-500 pre-rendered via generateStaticParams
 - Security: CRON_SECRET on sync endpoint; SSRF allowlist on all server-side fetches
 
@@ -87,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-25T08:26:36.634Z
+Last session: 2026-05-25T10:04:23.528Z
 Stopped at: context exhaustion at 75% (2026-05-25)
 Resume file: None

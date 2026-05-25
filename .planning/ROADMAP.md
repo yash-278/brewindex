@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Data Pipeline** - Sync job, Postgres schema, icon/GitHub enrichment, and security hardening for the cron endpoint
 - [ ] **Phase 2: Catalog UI** - Design sketches, browse grid, cask detail pages with install copy and stats
-- [ ] **Phase 5.1: Migrate Icon Storage to Railway Bucket** [INSERTED] - Replace Vercel Blob with Railway S3 bucket (Tigris), retire BLOB_READ_WRITE_TOKEN, clear old icon_url rows for re-sync
+- [x] **Phase 5.1: Migrate Icon Storage to Railway Bucket** [INSERTED] - Replace Vercel Blob with Railway S3 bucket (Tigris), retire BLOB_READ_WRITE_TOKEN, clear old icon_url rows for re-sync
 - [ ] **Phase 3: Search + Security** - Name search, platform filter, rate limiting, and WAF rules
 - [ ] **Phase 4: Discovery Layer** - Category filter, sorting, GitHub stats on detail pages
 - [ ] **Phase 5: Railway Migration** - Move backend and Postgres to Railway hobby tier ($5/mo), cron setup on Railway, monorepo strategy
@@ -86,7 +86,11 @@ Plans:
   5. All existing `icon_url` rows pointing to `blob.vercel-storage.com` are cleared (set to NULL) so the next sync re-fetches them into the new bucket
   6. New env vars (`S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`) are documented; `BLOB_READ_WRITE_TOKEN` is retired
 
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+
+- [x] 05.1-01-PLAN.md — Replace @vercel/blob with @aws-sdk/client-s3; update env validation, remotePatterns, null-out migration script; deploy and smoke test
 
 ---
 
@@ -131,7 +135,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Search + Security | 0/? | Not started | - |
 | 4. Discovery Layer | 0/? | Not started | - |
 | 5. Railway Migration | 0/4 | Not started | - |
-| 5.1. Icon Storage Migration | 0/? | Not started | - |
+| 5.1. Icon Storage Migration | 1/1 | Complete | 2026-05-25 |
 
 ### Phase 5: Railway Migration
 
