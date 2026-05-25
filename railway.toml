@@ -1,3 +1,6 @@
+[build]
+buildCommand = "npm install"
+
 [deploy]
 startCommand = "npx tsx backend/src/server.ts"
 healthcheckPath = "/health"
