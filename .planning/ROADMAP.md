@@ -15,6 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Data Pipeline** - Sync job, Postgres schema, icon/GitHub enrichment, and security hardening for the cron endpoint
 - [ ] **Phase 2: Catalog UI** - Design sketches, browse grid, cask detail pages with install copy and stats
+- [ ] **Phase 5.1: Migrate Icon Storage to Railway Bucket** [INSERTED] - Replace Vercel Blob with Railway S3 bucket (Tigris), retire BLOB_READ_WRITE_TOKEN, clear old icon_url rows for re-sync
 - [ ] **Phase 3: Search + Security** - Name search, platform filter, rate limiting, and WAF rules
 - [ ] **Phase 4: Discovery Layer** - Category filter, sorting, GitHub stats on detail pages
 - [ ] **Phase 5: Railway Migration** - Move backend and Postgres to Railway hobby tier ($5/mo), cron setup on Railway, monorepo strategy
@@ -70,6 +71,25 @@ Plans:
 - [x] 02-02-PLAN.md — Browse slice: root redirect, header, CaskCard, CaskGrid, Pagination, browse page assembly (BRWS-01, BRWS-04)
 - [x] 02-03-PLAN.md — Detail slice: CopyButton client island, detail page hero/install/stats/metadata, generateStaticParams top-500, not-found state (DETL-01–04)
 
+### Phase 5.1: Migrate Icon Storage to Railway Bucket [INSERTED]
+
+**Goal**: Replace Vercel Blob with the Railway S3-compatible bucket (`roomy-breadbox`) so icon storage has no per-operation quota and is co-located with the backend that writes it
+**Mode:** mvp
+**Depends on**: Phase 5
+**Requirements**: DATA-03 (icon pipeline)
+**Success Criteria** (what must be TRUE):
+
+  1. `src/lib/icons.ts` writes icons to the Railway S3 bucket (`roomy-breadbox`) using `@aws-sdk/client-s3` — `@vercel/blob` is no longer imported or called
+  2. Icons are publicly readable via the bucket's virtual-hosted-style URL (`https://<bucket>.t3.storageapi.dev/<key>`)
+  3. `next.config.ts` `remotePatterns` allows the new storage hostname; the Vercel Blob pattern is removed
+  4. The SSRF allowlist (`fetch-allowlist.ts`) permits the Railway storage endpoint
+  5. All existing `icon_url` rows pointing to `blob.vercel-storage.com` are cleared (set to NULL) so the next sync re-fetches them into the new bucket
+  6. New env vars (`S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`) are documented; `BLOB_READ_WRITE_TOKEN` is retired
+
+**Plans**: TBD
+
+---
+
 ### Phase 3: Search + Security
 
 **Goal**: Users can find specific casks by name and filter by platform, and the public API surface is protected against abuse
@@ -111,6 +131,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Search + Security | 0/? | Not started | - |
 | 4. Discovery Layer | 0/? | Not started | - |
 | 5. Railway Migration | 0/4 | Not started | - |
+| 5.1. Icon Storage Migration | 0/? | Not started | - |
 
 ### Phase 5: Railway Migration
 
