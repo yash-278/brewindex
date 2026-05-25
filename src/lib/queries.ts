@@ -1,6 +1,6 @@
 import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
-import { casks } from '@/db/schema';
+import { casks, type CaskSelectRow } from '@/db/schema';
 import { and, desc, eq, sql } from 'drizzle-orm';
 
 /** Number of casks per page — single source of truth shared with browse/page.tsx. */
@@ -62,3 +62,26 @@ export const getTop500Tokens = unstable_cache(
   ['top-500-tokens'],
   { tags: ['casks'] }
 );
+
+/** Result cap for full-text search — single source of truth. */
+export const SEARCH_RESULT_CAP = 50;
+
+/** Full-text search over cask name + description using tsvector/GIN index.
+ *  NOT cached — search results must be fresh per query.
+ */
+export async function searchCasks(q: string): Promise<CaskSelectRow[]> {
+  return db
+    .select()
+    .from(casks)
+    .where(
+      and(
+        eq(casks.is_active, true),
+        sql`${casks.search_vector} @@ plainto_tsquery('english', ${q})`
+      )
+    )
+    .orderBy(
+      sql`ts_rank(${casks.search_vector}, plainto_tsquery('english', ${q})) DESC`,
+      desc(casks.install_365d)
+    )
+    .limit(SEARCH_RESULT_CAP);
+}
