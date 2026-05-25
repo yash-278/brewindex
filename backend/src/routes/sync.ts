@@ -148,7 +148,7 @@ export async function syncHandler(c: Context) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
 
-  const missing = ["DATABASE_URL", "CRON_SECRET", "GITHUB_TOKEN", "S3_ENDPOINT", "S3_BUCKET", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY", "VERCEL_REVALIDATE_URL"].filter((k) => !process.env[k]);
+  const missing = ["DATABASE_URL", "CRON_SECRET", "GITHUB_TOKEN", "AWS_ENDPOINT_URL", "AWS_S3_BUCKET_NAME", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "VERCEL_REVALIDATE_URL"].filter((k) => !process.env[k]);
   if (missing.length > 0) {
     logger.error('sync.request', { status: 500, outcome: 'misconfigured', missing_vars: missing, duration_ms: Date.now() - start });
     return c.json({ ok: false, error: 'Server misconfiguration' }, 500);

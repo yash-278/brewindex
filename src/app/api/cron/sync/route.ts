@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const missing = ["DATABASE_URL", "CRON_SECRET", "GITHUB_TOKEN", "S3_ENDPOINT", "S3_BUCKET", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"].filter((k) => !process.env[k]);
+  const missing = ["DATABASE_URL", "CRON_SECRET", "GITHUB_TOKEN", "AWS_ENDPOINT_URL", "AWS_S3_BUCKET_NAME", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"].filter((k) => !process.env[k]);
   if (missing.length > 0) {
     return new Response(JSON.stringify({ ok: false, missing }), {
       status: 500,

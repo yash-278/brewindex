@@ -5,10 +5,10 @@ const DUCKDUCKGO_FAVICON = 'https://icons.duckduckgo.com/ip3';
 
 const s3 = new S3Client({
   region: 'auto',
-  endpoint: process.env.S3_ENDPOINT!,
+  endpoint: process.env.AWS_ENDPOINT_URL!,
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
   forcePathStyle: false,
 });
@@ -34,7 +34,7 @@ export async function fetchAndStoreIcon(
 
   const iconBuffer = await res.arrayBuffer();
   const key = `icons/${token}.ico`;
-  const bucket = process.env.S3_BUCKET!;
+  const bucket = process.env.AWS_S3_BUCKET_NAME!;
 
   await s3.send(new PutObjectCommand({
     Bucket: bucket,
