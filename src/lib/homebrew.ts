@@ -22,7 +22,7 @@ const AnalyticsEntrySchema = z.object({
 });
 
 const AnalyticsResponseSchema = z.object({
-  formulae: z.array(AnalyticsEntrySchema),
+  formulae: z.record(z.string(), z.array(AnalyticsEntrySchema)),
 });
 
 // ---------------------------------------------------------------------------
@@ -109,17 +109,23 @@ export async function fetchHomebrewAnalytics(): Promise<Map<string, { d30: numbe
 
   const map = new Map<string, { d30: number; d90: number; d365: number }>();
 
-  for (const entry of d30data.formulae) {
-    const existing = map.get(entry.cask) ?? { d30: 0, d90: 0, d365: 0 };
-    map.set(entry.cask, { ...existing, d30: parseAnalyticsCount(entry.count) });
+  for (const entries of Object.values(d30data.formulae)) {
+    for (const entry of entries) {
+      const existing = map.get(entry.cask) ?? { d30: 0, d90: 0, d365: 0 };
+      map.set(entry.cask, { ...existing, d30: parseAnalyticsCount(entry.count) });
+    }
   }
-  for (const entry of d90data.formulae) {
-    const existing = map.get(entry.cask) ?? { d30: 0, d90: 0, d365: 0 };
-    map.set(entry.cask, { ...existing, d90: parseAnalyticsCount(entry.count) });
+  for (const entries of Object.values(d90data.formulae)) {
+    for (const entry of entries) {
+      const existing = map.get(entry.cask) ?? { d30: 0, d90: 0, d365: 0 };
+      map.set(entry.cask, { ...existing, d90: parseAnalyticsCount(entry.count) });
+    }
   }
-  for (const entry of d365data.formulae) {
-    const existing = map.get(entry.cask) ?? { d30: 0, d90: 0, d365: 0 };
-    map.set(entry.cask, { ...existing, d365: parseAnalyticsCount(entry.count) });
+  for (const entries of Object.values(d365data.formulae)) {
+    for (const entry of entries) {
+      const existing = map.get(entry.cask) ?? { d30: 0, d90: 0, d365: 0 };
+      map.set(entry.cask, { ...existing, d365: parseAnalyticsCount(entry.count) });
+    }
   }
 
   return map;
