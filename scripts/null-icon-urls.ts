@@ -2,20 +2,20 @@
 // icon_url contains 'blob.vercel-storage.com' (Vercel Blob rows).
 //
 // Run with:
-//   dotenv -e .env.local npx tsx scripts/null-icon-urls.ts
+//   npx tsx scripts/null-icon-urls.ts
 //
-// The 'dotenv -e .env.local' prefix is required because ESM static imports are hoisted
-// before any runtime code executes — without this prefix, the db pool initializes with
-// undefined DATABASE_URL and fails before dotenv.config() can run.
+// Dynamic imports are used so that dotenv.config() runs before the db pool
+// initializes — static imports are hoisted and would cause DATABASE_URL to be
+// undefined when new Pool() is called.
 
 import { config } from 'dotenv';
 config({ path: '.env.local' });
 
-import { db } from '../src/db/index';
-import { casks } from '../src/db/schema';
-import { like } from 'drizzle-orm';
-
 async function main() {
+  const { db } = await import('../src/db/index');
+  const { casks } = await import('../src/db/schema');
+  const { like } = await import('drizzle-orm');
+
   const result = await db
     .update(casks)
     .set({ icon_url: null, icon_is_fallback: false })
