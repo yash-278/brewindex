@@ -451,14 +451,16 @@ export default async function CaskPage({
                 Homepage
               </span>
               <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-                <a
-                  href={safeHomepage ?? '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: 'var(--color-primary-hover)' }}
-                >
-                  {domain || safeHomepage || '—'}
-                </a>
+                {safeHomepage ? (
+                  <a
+                    href={safeHomepage}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: 'var(--color-primary-hover)' }}
+                  >
+                    {domain || safeHomepage}
+                  </a>
+                ) : '—'}
               </span>
             </div>
           </div>
