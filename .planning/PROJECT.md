@@ -83,4 +83,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after Phase 01 (data-pipeline) completion*
+*Last updated: 2026-05-25 after Phase 03 (search-security) completion — SRCH-01 full-text search live, loading skeletons for browse + cask detail, tsvector foundation in Neon Postgres*
