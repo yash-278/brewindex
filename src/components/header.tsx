@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
+import { SearchInput } from '@/components/search-input';
 
 export function Header({ caskCount }: { caskCount: number }) {
   return (
@@ -41,24 +43,30 @@ export function Header({ caskCount }: { caskCount: number }) {
         </span>
       </Link>
 
-      {/* Search bar (disabled placeholder) */}
-      <input
-        type="text"
-        placeholder="Search casks…"
-        disabled
-        style={{
-          flex: 1,
-          maxWidth: '480px',
-          opacity: 0.55,
-          cursor: 'not-allowed',
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: '8px',
-          padding: '8px 12px',
-          color: 'var(--color-text-muted)',
-          fontSize: '0.8125rem',
-        }}
-      />
+      {/* Search input client island — Suspense required for useSearchParams */}
+      <Suspense
+        fallback={
+          <input
+            type="text"
+            placeholder="Search casks…"
+            disabled
+            style={{
+              flex: 1,
+              maxWidth: '480px',
+              opacity: 0.55,
+              cursor: 'not-allowed',
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: '8px',
+              padding: '8px 12px',
+              color: 'var(--color-text-muted)',
+              fontSize: '0.8125rem',
+            }}
+          />
+        }
+      >
+        <SearchInput />
+      </Suspense>
 
       {/* Cask count */}
       <span
