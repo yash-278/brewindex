@@ -119,7 +119,7 @@ Plans:
 
 **Wave 2** *(blocked on 03-01)*
 
-- [ ] 03-02-PLAN.md — Search vertical slice: /api/search route, SearchInput client island, header wiring with Suspense, browse page ?q branch (SRCH-01)
+- [x] 03-02-PLAN.md — Search vertical slice: /api/search route, SearchInput client island, header wiring with Suspense, browse page ?q branch (SRCH-01)
 
 ### Phase 4: Discovery Layer
 
