@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-25T08:40:17.089Z",
+  "phase": "05",
+  "phase_name": "railway-migration",
+  "phase_dir": ".planning/phases/05-railway-migration",
+  "plan": 4,
+  "task": 3,
+  "total_tasks": 3,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": "05-01", "name": "node-postgres driver swap + drizzle-kit push", "status": "done", "commit": "b45d8cf"},
+    {"id": "05-02", "name": "ISR revalidation webhook", "status": "done", "commit": "aee3554"},
+    {"id": "05-03", "name": "Railway backend Hono server scaffold", "status": "done", "commit": "1976d5c"},
+    {"id": "05-04-t1", "name": "Remove Vercel cron, create railway.toml", "status": "done", "commit": "3659ab6"},
+    {"id": "05-04-t2", "name": "Deploy Railway services", "status": "done", "commit": "dceac00"},
+    {"id": "05-04-t3", "name": "Smoke test", "status": "done", "notes": "GET /health ok, POST /sync auth verified"}
+  ],
+  "remaining_tasks": [
+    {"id": "verify", "name": "Run gsd-verifier for phase goal verification", "status": "not_started"},
+    {"id": "state-update", "name": "Mark phase complete in ROADMAP/STATE", "status": "not_started"},
+    {"id": "sync-validate", "name": "Confirm full sync run completes on Railway after schema fix", "status": "not_started"}
+  ],
+  "blockers": [
+    {
+      "description": "Homebrew analytics API schema mismatch was discovered during live cron run — formulae is a dict not array. Fix committed (339952b) and pushed but Railway redeploy pending.",
+      "type": "technical",
+      "workaround": "Fix is deployed via git push. Watch Railway Deploy Logs for next cron run."
+    }
+  ],
+  "human_actions_pending": [
+    {
+      "action": "Confirm Railway backend redeploys with latest commit (339952b) and next cron run succeeds",
+      "context": "Homebrew analytics schema fix was the last blocker. elegant-spontaneity cron fires every 6h.",
+      "blocking": false
+    },
+    {
+      "action": "Update Vercel DATABASE_URL to Railway Postgres connection string if not done yet",
+      "context": "Vercel frontend still needs to point at Railway Postgres for ISR queries to work correctly",
+      "blocking": false
+    },
+    {
+      "action": "Enable App Sleeping on Railway backend service (Settings → App Sleeping → 10min idle timeout)",
+      "context": "Cost optimization — backend sleeps when no cron traffic",
+      "blocking": false
+    }
+  ],
+  "decisions": [
+    {"decision": "Used Dockerfile instead of Railpack", "rationale": "Railpack runs hardcoded npm ci which fails due to platform-specific @emnapi deps in lock file", "phase": "05"},
+    {"decision": "Bind Hono server to 0.0.0.0", "rationale": "Railway routes external traffic via internal network interface, localhost binding causes connection refused", "phase": "05"},
+    {"decision": "railway.toml at repo root not backend/", "rationale": "Railway looks for railway.toml at service root; backend/ location was ignored", "phase": "05"},
+    {"decision": "PORT=8080 for public domain", "rationale": "Railway injects PORT=8080 at runtime; domain generation must specify 8080 not 3000", "phase": "05"}
+  ],
+  "uncommitted_files": [
+    ".planning/STATE.md",
+    ".planning/phases/05-railway-migration/05-REVIEW.md"
+  ],
+  "next_action": "Run gsd-verifier to verify phase 05 goal achievement, then mark phase complete. Confirm Railway cron runs successfully after schema fix.",
+  "context_notes": "All 4 plans executed. Railway backend live at brewindex-production.up.railway.app. Code review done with 4 criticals fixed. Homebrew analytics schema bug fixed (formulae was dict not array). Phase is functionally complete pending verifier and final state update."
+}
