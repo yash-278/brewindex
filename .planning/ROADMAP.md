@@ -132,13 +132,13 @@ Plans:
 
 **Wave 1** *(parallel — no dependencies)*
 
-- [ ] 05-01-PLAN.md — DB driver swap: replace @neondatabase/serverless with pg + drizzle-orm/node-postgres, provision Railway Postgres, drizzle-kit push [BLOCKING]
-- [ ] 05-02-PLAN.md — Vercel revalidate webhook: new GET /api/revalidate route handler for ISR cache invalidation
+- [x] 05-01-PLAN.md — DB driver swap: replace @neondatabase/serverless with pg + drizzle-orm/node-postgres, provision Railway Postgres, drizzle-kit push [BLOCKING]
+- [x] 05-02-PLAN.md — Vercel revalidate webhook: new GET /api/revalidate route handler for ISR cache invalidation
 
 **Wave 2** *(blocked on 05-01)*
 
-- [ ] 05-03-PLAN.md — Backend scaffold: backend/ directory, Hono server, sync handler port from Next.js route, Railway cron trigger script
+- [x] 05-03-PLAN.md — Backend scaffold: backend/ directory, Hono server, sync handler port from Next.js route, Railway cron trigger script
 
 **Wave 3** *(blocked on 05-01 + 05-02 + 05-03)*
 
-- [ ] 05-04-PLAN.md — Deployment cutover: remove Vercel cron config, railway.toml, Railway service creation, end-to-end smoke test [CHECKPOINT]
+- [x] 05-04-PLAN.md — Deployment cutover: remove Vercel cron config, railway.toml, Railway service creation, end-to-end smoke test [CHECKPOINT]
