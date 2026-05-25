@@ -21,18 +21,16 @@ decisions:
 metrics:
   completed_date: "2026-05-25"
   duration: "~5 minutes"
-  tasks_completed: 1
+  tasks_completed: 3
   tasks_total: 3
-  status: checkpoint_reached
+  status: complete
 ---
 
 # Phase 5 Plan 01: Railway Postgres Driver Swap Summary
 
-**One-liner:** Replaced Neon HTTP driver with pg.Pool (drizzle-orm/node-postgres) with max:2 SSL-conditional config, removed @neondatabase/serverless from package.json.
+**One-liner:** Replaced Neon HTTP driver with pg.Pool (drizzle-orm/node-postgres) with max:2 SSL-conditional config, removed @neondatabase/serverless, pushed schema to Railway Postgres.
 
-## Status: CHECKPOINT REACHED — Awaiting Human Action
-
-Task 1 is complete and committed. Tasks 2 and 3 require human provisioning of Railway Postgres before proceeding.
+## Status: COMPLETE
 
 ## Tasks Completed
 
@@ -65,13 +63,13 @@ export const db = drizzle({ client: pool, schema });
 - Added to dependencies: `pg@^8.21.0`
 - Added to devDependencies: `@types/pg@^8.20.0`
 
-## Tasks Pending
+### Task 2: [HUMAN] Provision Railway Postgres and update DATABASE_URL (DONE)
+User provisioned Railway Postgres and updated `.env.local` with Railway connection string.
 
-### Task 2: [HUMAN] Provision Railway Postgres and update DATABASE_URL
-Requires user to provision Railway Postgres service and update `.env.local` with the new connection string.
-
-### Task 3: Run drizzle-kit push to create schema on Railway Postgres
-Blocked by Task 2. After DATABASE_URL is set, runs `npx drizzle-kit push` and `npm install`.
+### Task 3: Run drizzle-kit push to create schema on Railway Postgres (DONE)
+- `npx drizzle-kit push` → "Changes applied" (exit 0)
+- `npm install` → completed, @neondatabase/serverless removed from node_modules
+- `npx tsc --noEmit` → exit 0, no type errors
 
 ## Deviations from Plan
 
@@ -96,4 +94,7 @@ None.
 
 - [x] src/db/index.ts exists and contains `drizzle-orm/node-postgres`, `new Pool(`, `max: 2`, `rejectUnauthorized`
 - [x] package.json has 0 references to `neondatabase/serverless`
+- [x] drizzle-kit push exited 0: "Changes applied"
+- [x] npm install completed, node_modules updated
+- [x] npx tsc --noEmit exited 0 (no type errors)
 - [x] Commit 4937293 exists
