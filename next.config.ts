@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'icons.duckduckgo.com' },
       { protocol: 'https', hostname: 'icon.horse' },
-      { protocol: 'https', hostname: 'roomy-breadbox-0sbir2el4w.t3.storage.dev' },
+      { protocol: 'https', hostname: 'brewindex-icons.t3.tigrisfiles.io' },
     ],
   },
 };

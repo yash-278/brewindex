@@ -44,6 +44,6 @@ export async function fetchAndStoreIcon(
     ACL: 'public-read',
   }));
 
-  const publicUrl = `https://${bucket}.t3.storage.dev/${key}`;
+  const publicUrl = `https://${bucket}.t3.tigrisfiles.io/${key}`;
   return { url: publicUrl, isFallback: false };
 }
