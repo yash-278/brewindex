@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getCasksPage, getCasksCount, PAGE_SIZE, searchCasks } from '@/lib/queries';
 import { CaskGrid } from '@/components/cask-grid';
 import { Pagination } from '@/components/pagination';
+import { SEARCH_MIN_LENGTH, SEARCH_MAX_LENGTH } from '@/lib/search-constants';
 
 export const metadata: Metadata = { title: 'Browse Casks — BrewIndex' };
 
@@ -14,12 +15,13 @@ export default async function BrowsePage({
   const { page: pageParam, q } = await searchParams;
 
   // Search mode — branch taken when ?q is present and meets min length
-  if (q && q.trim().length >= 2) {
-    const results = await searchCasks(q.trim());
+  if (q && q.trim().length >= SEARCH_MIN_LENGTH) {
+    const trimmed = q.trim().slice(0, SEARCH_MAX_LENGTH);
+    const results = await searchCasks(trimmed);
     return (
       <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 24px 32px' }}>
         <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
-          {results.length} result{results.length !== 1 ? 's' : ''} for &ldquo;{q.trim()}&rdquo;
+          {results.length} result{results.length !== 1 ? 's' : ''} for &ldquo;{trimmed}&rdquo;
         </p>
         <CaskGrid casks={results} />
         {/* No <Pagination> in search mode — D-03 */}
