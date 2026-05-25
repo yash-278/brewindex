@@ -28,13 +28,7 @@ export function CaskGrid({ casks }: { casks: CaskSelectRow[] }) {
   }
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-        gap: '12px',
-      }}
-    >
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {casks.map((cask) => (
         <CaskCard key={cask.token} cask={cask} />
       ))}

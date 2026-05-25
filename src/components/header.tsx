@@ -28,15 +28,7 @@ export function Header({ caskCount }: { caskCount: number }) {
           color: 'inherit',
         }}
       >
-        <div
-          style={{
-            width: '24px',
-            height: '24px',
-            borderRadius: '6px',
-            background: 'linear-gradient(135deg, #7c6aff, #c084fc)',
-            flexShrink: 0,
-          }}
-        />
+        <span style={{ fontSize: '1.25rem', lineHeight: 1 }}>🍺</span>
         <span
           style={{
             fontSize: '1rem',
@@ -45,7 +37,7 @@ export function Header({ caskCount }: { caskCount: number }) {
             color: 'var(--color-text)',
           }}
         >
-          🍺 BrewIndex
+          BrewIndex
         </span>
       </Link>
 
