@@ -17,6 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: Catalog UI** - Design sketches, browse grid, cask detail pages with install copy and stats
 - [ ] **Phase 3: Search + Security** - Name search, platform filter, rate limiting, and WAF rules
 - [ ] **Phase 4: Discovery Layer** - Category filter, sorting, GitHub stats on detail pages
+- [ ] **Phase 5: Railway Migration** - Move backend and Postgres to Railway hobby tier ($5/mo), cron setup on Railway, monorepo strategy
 
 ## Phase Details
 
@@ -101,7 +102,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -109,3 +110,35 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 2. Catalog UI | 0/3 | Not started | - |
 | 3. Search + Security | 0/? | Not started | - |
 | 4. Discovery Layer | 0/? | Not started | - |
+| 5. Railway Migration | 0/4 | Not started | - |
+
+### Phase 5: Railway Migration
+
+**Goal**: The backend (sync cron, API routes) and Postgres database run on Railway hobby tier; the monorepo serves both the Next.js frontend and the Railway backend from a single repository; sleeping/wake-on-request behavior replaces always-on Vercel Functions for backend routes
+**Mode:** mvp
+**Depends on**: Phase 4
+**Requirements**: RAIL-01, RAIL-02, RAIL-03, RAIL-04, RAIL-05
+**Success Criteria** (what must be TRUE):
+
+  1. Postgres runs on Railway (not Neon); all existing Drizzle queries continue to work against the Railway-managed Postgres instance
+  2. The sync cron job runs on Railway (not Vercel Cron) — Railway's built-in cron scheduler triggers the sync on the configured schedule with no additional cost
+  3. The Next.js frontend (Vercel) and Railway backend coexist in the same git repository without build interference
+  4. Railway services sleep when idle and wake on the first request with acceptable cold-start latency for background/cron workloads
+  5. All environment variables (DB connection string, cron secret, etc.) are migrated to Railway without leaking to the frontend Vercel deployment
+
+**Plans**: 4 plans
+
+Plans:
+
+**Wave 1** *(parallel — no dependencies)*
+
+- [ ] 05-01-PLAN.md — DB driver swap: replace @neondatabase/serverless with pg + drizzle-orm/node-postgres, provision Railway Postgres, drizzle-kit push [BLOCKING]
+- [ ] 05-02-PLAN.md — Vercel revalidate webhook: new GET /api/revalidate route handler for ISR cache invalidation
+
+**Wave 2** *(blocked on 05-01)*
+
+- [ ] 05-03-PLAN.md — Backend scaffold: backend/ directory, Hono server, sync handler port from Next.js route, Railway cron trigger script
+
+**Wave 3** *(blocked on 05-01 + 05-02 + 05-03)*
+
+- [ ] 05-04-PLAN.md — Deployment cutover: remove Vercel cron config, railway.toml, Railway service creation, end-to-end smoke test [CHECKPOINT]
