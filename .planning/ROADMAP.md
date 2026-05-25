@@ -96,18 +96,30 @@ Plans:
 
 ### Phase 3: Search + Security
 
-**Goal**: Users can find specific casks by name and filter by platform, and the public API surface is protected against abuse
+**Goal**: Users can find specific casks by name, with fast Postgres full-text search, and page transitions are smooth with skeleton loading states
 **Mode:** mvp
 **Depends on**: Phase 2
-**Requirements**: SRCH-01, SRCH-02, SECU-01, SECU-02
+**Requirements**: SRCH-01, SRCH-02 (deferred), SECU-01 (deferred), SECU-02 (deferred)
 **Success Criteria** (what must be TRUE):
 
-  1. Typing a cask name into the search bar returns matching results from the database (server-side Postgres query) without shipping the full 15.5 MB corpus to the browser
-  2. Search results can be filtered to show only casks compatible with a specific macOS platform (e.g., arm64, x86_64)
-  3. Any IP that exceeds the rate limit on a public API route receives a 429 response; legitimate users are unaffected at normal usage patterns
-  4. Vercel WAF rules are active and block known bot patterns and abusive traffic before they reach the application
+  1. Typing a cask name into the search bar returns matching results from the database (server-side Postgres tsvector query) without shipping the full corpus to the browser
+  2. Navigating to /browse or /cask/[token] shows an instant skeleton loading state before the server render completes
 
-**Plans**: TBD
+**Deferred (user decisions recorded in 03-CONTEXT.md):**
+- SRCH-02 (platform filter): No platform data in schema; requires Phase 1 backfill. Deferred per planning context.
+- SECU-01 (rate limiting): Deferred per D-15. Upstash ratelimit already in package.json; revisit Phase 4.
+- SECU-02 (WAF managed rulesets): Requires Enterprise plan. Deferred per planning context.
+
+**Plans**: 3 plans
+
+**Wave 1** *(parallel — no dependencies)*
+
+- [ ] 03-01-PLAN.md — DB + query layer: tsvector column, GIN index, drizzle-kit generate+migrate [BLOCKING], searchCasks function (SRCH-01)
+- [ ] 03-03-PLAN.md — Loading skeletons: browse/loading.tsx and cask/[token]/loading.tsx pulse cards (D-11, D-12, D-13)
+
+**Wave 2** *(blocked on 03-01)*
+
+- [ ] 03-02-PLAN.md — Search vertical slice: /api/search route, SearchInput client island, header wiring with Suspense, browse page ?q branch (SRCH-01)
 
 ### Phase 4: Discovery Layer
 
@@ -132,7 +144,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Data Pipeline | 0/5 | Not started | - |
 | 2. Catalog UI | 0/3 | Not started | - |
-| 3. Search + Security | 0/? | Not started | - |
+| 3. Search + Security | 0/3 | Not started | - |
 | 4. Discovery Layer | 0/? | Not started | - |
 | 5. Railway Migration | 0/4 | Not started | - |
 | 5.1. Icon Storage Migration | 1/1 | Complete | 2026-05-25 |
