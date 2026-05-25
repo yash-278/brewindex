@@ -1,6 +1,7 @@
 import { getCaskByToken, getTop500Tokens } from '@/lib/queries';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { CopyButton } from '@/components/copy-button';
 import { InitialsAvatar } from '@/components/initials-avatar';
 import { formatInstallCount } from '@/lib/format';
@@ -72,6 +73,28 @@ export default async function CaskPage({
         padding: '0 24px 48px',
       }}
     >
+      {/* Back navigation */}
+      <div style={{ paddingTop: '20px' }}>
+        <Link
+          href="/browse"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '0.8125rem',
+            color: 'var(--color-text-muted)',
+            textDecoration: 'none',
+            padding: '6px 10px',
+            borderRadius: '6px',
+            border: '1px solid var(--color-border)',
+            background: 'var(--color-surface)',
+            transition: 'color 0.15s ease, border-color 0.15s ease',
+          }}
+        >
+          ← Back to Browse
+        </Link>
+      </div>
+
       {/* Hero Section */}
       <div
         style={{

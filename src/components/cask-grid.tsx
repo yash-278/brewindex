@@ -31,7 +31,7 @@ export function CaskGrid({ casks }: { casks: CaskSelectRow[] }) {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(460px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
         gap: '12px',
       }}
     >

@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export function Header({ caskCount }: { caskCount: number }) {
   return (
     <header
@@ -14,8 +16,18 @@ export function Header({ caskCount }: { caskCount: number }) {
         gap: '24px',
       }}
     >
-      {/* Logo + wordmark */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+      {/* Logo + wordmark — clicks navigate to home */}
+      <Link
+        href="/"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          flexShrink: 0,
+          textDecoration: 'none',
+          color: 'inherit',
+        }}
+      >
         <div
           style={{
             width: '24px',
@@ -33,9 +45,9 @@ export function Header({ caskCount }: { caskCount: number }) {
             color: 'var(--color-text)',
           }}
         >
-          BrewIndex
+          🍺 BrewIndex
         </span>
-      </div>
+      </Link>
 
       {/* Search bar (disabled placeholder) */}
       <input
