@@ -1,9 +1,7 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import type { CaskSelectRow } from '@/db/schema';
-import { InitialsAvatar } from '@/components/initials-avatar';
+import { CaskIcon } from '@/components/cask-icon';
 import { formatInstallCount } from '@/lib/format';
-import { DARK_BLUR_DATA_URL } from '@/lib/blur-data-url';
 
 export function CaskCard({ cask }: { cask: CaskSelectRow }) {
   return (
@@ -25,19 +23,12 @@ export function CaskCard({ cask }: { cask: CaskSelectRow }) {
     >
       {/* Icon slot */}
       <div style={{ flexShrink: 0, marginTop: '2px' }}>
-        {!cask.icon_is_fallback && cask.icon_url ? (
-          <Image
-            src={cask.icon_url}
-            width={52}
-            height={52}
-            alt={cask.name + ' icon'}
-            className="rounded-[10px]"
-            placeholder="blur"
-            blurDataURL={DARK_BLUR_DATA_URL}
-          />
-        ) : (
-          <InitialsAvatar token={cask.token} size={52} />
-        )}
+        <CaskIcon
+          token={cask.token}
+          name={cask.name}
+          iconUrl={cask.icon_is_fallback ? null : cask.icon_url}
+          size={52}
+        />
       </div>
 
       {/* Card body */}
