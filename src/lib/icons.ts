@@ -1,7 +1,17 @@
-import { put } from '@vercel/blob';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { safeFetch } from './fetch-allowlist';
 
 const DUCKDUCKGO_FAVICON = 'https://icons.duckduckgo.com/ip3';
+
+const s3 = new S3Client({
+  region: 'auto',
+  endpoint: process.env.S3_ENDPOINT!,
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+  },
+  forcePathStyle: false,
+});
 
 export async function fetchAndStoreIcon(
   token: string,
@@ -11,7 +21,6 @@ export async function fetchAndStoreIcon(
   try {
     domain = new URL(homepage).hostname;
   } catch {
-    // Invalid or empty homepage URL — return fallback immediately
     return { url: null, isFallback: true };
   }
 
@@ -24,11 +33,17 @@ export async function fetchAndStoreIcon(
   }
 
   const iconBuffer = await res.arrayBuffer();
-  const blob = await put(`icons/${token}.ico`, iconBuffer, {
-    access: 'public',
-    contentType: 'image/x-icon',
-    allowOverwrite: true,
-  });
+  const key = `icons/${token}.ico`;
+  const bucket = process.env.S3_BUCKET!;
 
-  return { url: blob.url, isFallback: false };
+  await s3.send(new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    Body: Buffer.from(iconBuffer),
+    ContentType: 'image/x-icon',
+    ACL: 'public-read',
+  }));
+
+  const publicUrl = `https://${bucket}.t3.storage.dev/${key}`;
+  return { url: publicUrl, isFallback: false };
 }
