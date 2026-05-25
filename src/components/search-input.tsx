@@ -1,9 +1,9 @@
 'use client';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { SEARCH_MIN_LENGTH } from '@/lib/search-constants';
 
 const DEBOUNCE_MS = 300;
-const MIN_QUERY_LENGTH = 2;
 
 export function SearchInput() {
   const searchParams = useSearchParams();
@@ -17,6 +17,13 @@ export function SearchInput() {
     setValue(searchParams.get('q') ?? '');
   }, [searchParams]);
 
+  // Clear any pending debounce timer on unmount to prevent spurious navigations
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const v = e.target.value;
@@ -24,7 +31,7 @@ export function SearchInput() {
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
         const params = new URLSearchParams(searchParams.toString());
-        if (v.trim().length >= MIN_QUERY_LENGTH) {
+        if (v.trim().length >= SEARCH_MIN_LENGTH) {
           params.set('q', v.trim());
           params.delete('page');
         } else {
