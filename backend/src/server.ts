@@ -10,4 +10,5 @@ app.get('/health', (c) => c.json({ ok: true }));
 serve({
   fetch: app.fetch,
   port: Number(process.env.PORT) || 3000,
+  hostname: '0.0.0.0',
 });
