@@ -114,8 +114,8 @@ Plans:
 
 **Wave 1** *(parallel — no dependencies)*
 
-- [ ] 03-01-PLAN.md — DB + query layer: tsvector column, GIN index, drizzle-kit generate+migrate [BLOCKING], searchCasks function (SRCH-01)
-- [ ] 03-03-PLAN.md — Loading skeletons: browse/loading.tsx and cask/[token]/loading.tsx pulse cards (D-11, D-12, D-13)
+- [x] 03-01-PLAN.md — DB + query layer: tsvector column, GIN index, drizzle-kit generate+migrate [BLOCKING], searchCasks function (SRCH-01)
+- [x] 03-03-PLAN.md — Loading skeletons: browse/loading.tsx and cask/[token]/loading.tsx pulse cards (D-11, D-12, D-13)
 
 **Wave 2** *(blocked on 03-01)*
 
