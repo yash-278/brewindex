@@ -17,7 +17,8 @@ export async function syncHandler(c: Context) {
 
   const missing = ["DATABASE_URL", "CRON_SECRET", "GITHUB_TOKEN", "BLOB_READ_WRITE_TOKEN", "VERCEL_REVALIDATE_URL"].filter((k) => !process.env[k]);
   if (missing.length > 0) {
-    return c.json({ ok: false, missing }, 500);
+    console.error('[sync] missing env vars:', missing);
+    return c.json({ ok: false, error: 'Server misconfiguration' }, 500);
   }
 
   try {

@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  revalidateTag("casks", "max");
+  revalidateTag("casks");
+  revalidateTag("max");
 
   return Response.json({ revalidated: true, now: Date.now() });
 }
