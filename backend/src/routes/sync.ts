@@ -123,7 +123,10 @@ async function runSync() {
     logger.info('sync.revalidate_start');
     await fetch(process.env.VERCEL_REVALIDATE_URL!, {
       method: 'GET',
-      headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
+      headers: {
+        Authorization: `Bearer ${process.env.CRON_SECRET}`,
+        'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET ?? '',
+      },
     });
     logger.info('sync.revalidate_done');
 
@@ -148,7 +151,7 @@ export async function syncHandler(c: Context) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
 
-  const missing = ["DATABASE_URL", "CRON_SECRET", "GITHUB_TOKEN", "AWS_ENDPOINT_URL", "AWS_S3_BUCKET_NAME", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "VERCEL_REVALIDATE_URL"].filter((k) => !process.env[k]);
+  const missing = ["DATABASE_URL", "CRON_SECRET", "GITHUB_TOKEN", "AWS_ENDPOINT_URL", "AWS_S3_BUCKET_NAME", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "VERCEL_REVALIDATE_URL", "VERCEL_AUTOMATION_BYPASS_SECRET"].filter((k) => !process.env[k]);
   if (missing.length > 0) {
     logger.error('sync.request', { status: 500, outcome: 'misconfigured', missing_vars: missing, duration_ms: Date.now() - start });
     return c.json({ ok: false, error: 'Server misconfiguration' }, 500);
