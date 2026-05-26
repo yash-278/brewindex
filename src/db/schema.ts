@@ -22,6 +22,7 @@ export const casks = pgTable(
     install_30d:      integer('install_30d'),
     install_90d:      integer('install_90d'),
     install_365d:     integer('install_365d'),
+    category:         text('category'),
     github_stars:     integer('github_stars'),
     github_forks:     integer('github_forks'),
     github_issues:    integer('github_issues'),
