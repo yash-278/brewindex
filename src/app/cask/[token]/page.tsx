@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { CopyButton } from '@/components/copy-button';
 import { InitialsAvatar } from '@/components/initials-avatar';
+import { GitHubStatsCard } from '@/components/github-stats-card';
 import { formatInstallCount } from '@/lib/format';
 import { DARK_BLUR_DATA_URL } from '@/lib/blur-data-url';
 import { safeExternalUrl } from '@/lib/utils';
@@ -216,6 +217,9 @@ export default async function CaskPage({
           <CopyButton token={c.token} />
         </div>
       </section>
+
+      {/* GitHub Stats */}
+      <GitHubStatsCard cask={c} />
 
       {/* Stats + Metadata row */}
       <div

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { CaskSelectRow } from '@/db/schema';
 import { CaskIcon } from '@/components/cask-icon';
 import { formatInstallCount } from '@/lib/format';
+import { StarBadge } from '@/components/star-badge';
 
 export function CaskCard({ cask }: { cask: CaskSelectRow }) {
   return (
@@ -108,6 +109,11 @@ export function CaskCard({ cask }: { cask: CaskSelectRow }) {
           >
             ↓ {formatInstallCount(cask.install_365d)} / yr
           </span>
+
+          {/* GitHub stars badge */}
+          {cask.github_enriched && cask.github_stars !== null && (
+            <StarBadge count={cask.github_stars} />
+          )}
 
           {/* Platform pill */}
           <span
