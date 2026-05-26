@@ -133,7 +133,19 @@ Plans:
   2. Users can re-sort the browse grid by install count (most popular), alphabetical order, or most recently updated — and the sort persists across pagination
   3. Cask detail pages for apps with a GitHub upstream repo display a GitHub stats block showing stars, forks, and open issues
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Schema + query layer: category column, migration, getCasksPageFiltered/getCasksCountFiltered/getCategories (BRWS-02, BRWS-03)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04-02-PLAN.md — Filter/sort UI: CategoryFilter pills, SortDropdown, browse page integration, 4-column responsive grid (BRWS-02, BRWS-03)
+- [ ] 04-03-PLAN.md — GitHub stats display: GitHubStatsCard for detail pages, StarBadge for browse cards (DETL-05)
+- [ ] 04-04-PLAN.md — ML categorization: AWS Bedrock script, category population, ISR cache invalidation [CHECKPOINT] (BRWS-02)
 
 ## Progress
 
