@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import { db } from '@/db';
 import { casks, type CaskSelectRow } from '@/db/schema';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, asc, eq, sql } from 'drizzle-orm';
 
 /** Number of casks per page — single source of truth shared with browse/page.tsx. */
 export const PAGE_SIZE = 48;
@@ -85,3 +85,65 @@ export async function searchCasks(q: string): Promise<CaskSelectRow[]> {
     )
     .limit(SEARCH_RESULT_CAP);
 }
+
+/** Returns a page of active casks with optional category filter and dynamic sort order.
+ *  Sort options: 'popular' (365d install DESC), 'alphabetical' (name ASC), 'updated' (last_synced_at DESC).
+ */
+export const getCasksPageFiltered = unstable_cache(
+  async (opts: { category?: string; sort: 'popular' | 'alphabetical' | 'updated'; page: number }) => {
+    const { category, sort, page } = opts;
+    const offset = (page - 1) * PAGE_SIZE;
+
+    // Build WHERE conditions array — only add category filter if defined
+    const conditions: ReturnType<typeof eq>[] = [eq(casks.is_active, true)];
+    if (category) {
+      conditions.push(eq(casks.category, category));
+    }
+
+    // Build dynamic ORDER BY clause
+    const orderClause =
+      sort === 'alphabetical' ? asc(casks.name) :
+      sort === 'updated' ? desc(casks.last_synced_at) :
+      desc(casks.install_365d); // default: 'popular'
+
+    return db
+      .select()
+      .from(casks)
+      .where(and(...conditions))
+      .orderBy(orderClause)
+      .limit(PAGE_SIZE)
+      .offset(offset);
+  },
+  ['casks-filtered'],
+  { tags: ['casks'] }
+);
+
+/** Returns the count of active casks with optional category filter — for pagination. */
+export const getCasksCountFiltered = unstable_cache(
+  async (category?: string) => {
+    const conditions: ReturnType<typeof eq>[] = [eq(casks.is_active, true)];
+    if (category) {
+      conditions.push(eq(casks.category, category));
+    }
+    const result = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(casks)
+      .where(and(...conditions));
+    return result[0]?.count ?? 0;
+  },
+  ['casks-count-filtered'],
+  { tags: ['casks'] }
+);
+
+/** Returns distinct non-null categories for populating the category filter UI. */
+export const getCategories = unstable_cache(
+  async () => {
+    return db
+      .selectDistinct({ category: casks.category })
+      .from(casks)
+      .where(and(eq(casks.is_active, true), sql`${casks.category} IS NOT NULL`))
+      .orderBy(asc(casks.category));
+  },
+  ['categories'],
+  { tags: ['casks'] }
+);
