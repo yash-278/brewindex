@@ -1,23 +1,25 @@
 /**
  * scripts/categorize-casks.ts — One-time ML categorization job for BrewIndex
  *
- * Uses AWS Bedrock (Claude 3.5 Haiku) to assign categories to all active casks
+ * Uses AWS Bedrock (Amazon Nova Micro) to assign categories to all active casks
  * that do not yet have a category. Updates casks.category in the database and
  * invalidates the ISR cache via revalidateTag('casks').
  *
  * Usage: npx tsx scripts/categorize-casks.ts
+ *   Or with a named SSO profile: AWS_PROFILE=my-sso-profile npx tsx scripts/categorize-casks.ts
  *
  * Prerequisites:
  *   - DATABASE_URL must be set in .env.local (or environment)
  *   - AWS_REGION must be set (e.g. us-east-1)
- *   - AWS_ACCESS_KEY_ID must be set
- *   - AWS_SECRET_ACCESS_KEY must be set
- *   - IAM user/role must have bedrock:InvokeModel permission for Claude models
+ *   - AWS_PROFILE must be set to your SSO profile name (e.g. my-profile)
+ *     OR AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY set for static credentials
+ *   - Profile must have bedrock:InvokeModel permission for amazon.nova-micro-v1:0
+ *   - Run `aws sso login --profile <profile>` before executing if SSO session is expired
  *
- * Cost estimate:
- *   ~7,659 casks × ~500 tokens avg = ~3.8M tokens input
- *   On-demand pricing: $8/1M input tokens = ~$30 total (one-time run)
- *   Use batch inference (InvokeBatchCommand) if cost becomes a concern — 50% cheaper.
+ * Cost estimate (Amazon Nova Micro):
+ *   ~7,659 casks × ~500 input tokens avg = ~3.8M input tokens → $0.035/1M = ~$0.13
+ *   ~7,659 casks × ~10 output tokens avg = ~0.08M output tokens → $0.14/1M = ~$0.01
+ *   Total: ~$0.14 (vs ~$3 for Claude 3.5 Haiku — 20× cheaper for this classification task)
  */
 
 import 'dotenv/config';
@@ -29,13 +31,14 @@ import {
   BedrockRuntimeClient,
   InvokeModelCommand,
 } from '@aws-sdk/client-bedrock-runtime';
+import { fromSSO } from '@aws-sdk/credential-providers';
 import { revalidateTag } from 'next/cache';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const BEDROCK_MODEL = 'anthropic.claude-3-5-haiku-20241022-v1:0';
+const BEDROCK_MODEL = 'amazon.nova-micro-v1:0';
 const UPDATE_BATCH_SIZE = 100; // Flush DB updates every N categorizations
 
 // Predefined category list for consistent taxonomy (per D-02: model decides,
@@ -60,20 +63,33 @@ type Category = (typeof CATEGORIES)[number];
 // ---------------------------------------------------------------------------
 
 function checkCredentials(): boolean {
-  const required = ['DATABASE_URL', 'AWS_REGION', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'];
-  const missing = required.filter((k) => !process.env[k]);
+  const missing: string[] = [];
+  if (!process.env.DATABASE_URL) missing.push('DATABASE_URL');
+  if (!process.env.AWS_REGION) missing.push('AWS_REGION');
+
+  // Require either SSO profile OR static access key credentials
+  const hasProfile = Boolean(process.env.AWS_PROFILE);
+  const hasStaticCreds = Boolean(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY);
 
   if (missing.length > 0) {
     console.error('ERROR: Missing required environment variables:');
     for (const key of missing) {
       console.error(`  ${key}`);
     }
-    console.error('\nSet these in .env.local (for local runs) or in your deployment environment:');
+    console.error('\nSet these in .env.local (for local runs):');
     console.error('  DATABASE_URL=<your-postgres-connection-string>');
     console.error('  AWS_REGION=us-east-1');
-    console.error('  AWS_ACCESS_KEY_ID=<your-access-key>');
-    console.error('  AWS_SECRET_ACCESS_KEY=<your-secret-key>');
-    console.error('\nMake sure your IAM user/role has bedrock:InvokeModel permission.');
+    return false;
+  }
+
+  if (!hasProfile && !hasStaticCreds) {
+    console.error('ERROR: No AWS credentials found.');
+    console.error('\nOption 1 — SSO profile (recommended for local runs):');
+    console.error('  AWS_PROFILE=my-sso-profile npx tsx scripts/categorize-casks.ts');
+    console.error('  (run `aws sso login --profile my-sso-profile` first if session expired)');
+    console.error('\nOption 2 — Static credentials:');
+    console.error('  AWS_ACCESS_KEY_ID=<key> AWS_SECRET_ACCESS_KEY=<secret> npx tsx scripts/categorize-casks.ts');
+    console.error('\nMake sure your IAM user/role has bedrock:InvokeModel permission for amazon.nova-micro-v1:0');
     return false;
   }
 
@@ -85,8 +101,14 @@ function checkCredentials(): boolean {
 // ---------------------------------------------------------------------------
 
 /**
- * Ask Claude 3.5 Haiku to categorize a single cask into one of the predefined categories.
+ * Ask Nova Micro to categorize a single cask into one of the predefined categories.
  * Returns the matched category string, or 'Other' if the response cannot be parsed.
+ *
+ * Nova Micro request format differs from Anthropic:
+ *   - No `anthropic_version` field
+ *   - Uses `inferenceConfig.maxTokens` (not `max_tokens`)
+ *   - Content is an array of { text: string } objects (not plain string)
+ *   - Response: { output: { message: { content: [{ text: string }] } } }
  */
 async function categorizeCask(
   client: BedrockRuntimeClient,
@@ -101,9 +123,16 @@ async function categorizeCask(
     `Description: ${description ?? 'No description available.'}`;
 
   const body = JSON.stringify({
-    anthropic_version: 'bedrock-2023-05-31',
-    max_tokens: 50,
-    messages: [{ role: 'user', content: prompt }],
+    messages: [
+      {
+        role: 'user',
+        content: [{ text: prompt }],
+      },
+    ],
+    inferenceConfig: {
+      maxTokens: 20,
+      temperature: 0.1, // Low temperature for consistent classification
+    },
   });
 
   const response = await client.send(
@@ -115,12 +144,12 @@ async function categorizeCask(
     }),
   );
 
-  // Parse the Bedrock response body
+  // Nova Micro response structure: { output: { message: { content: [{ text: string }] } } }
   const responseBody = JSON.parse(Buffer.from(response.body).toString('utf-8')) as {
-    content: Array<{ type: string; text: string }>;
+    output: { message: { content: Array<{ text: string }> } };
   };
 
-  const rawText = responseBody.content[0]?.text?.trim() ?? '';
+  const rawText = responseBody.output?.message?.content?.[0]?.text?.trim() ?? '';
 
   // Match the response to one of our known categories (case-insensitive)
   const matched = CATEGORIES.find(
@@ -150,13 +179,19 @@ async function main() {
   });
   const db = drizzle({ client: pool, schema });
 
-  // Step 2: Set up Bedrock client
+  // Step 2: Set up Bedrock client — prefer SSO profile over static credentials
   const bedrockClient = new BedrockRuntimeClient({
     region: process.env.AWS_REGION!,
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    },
+    ...(process.env.AWS_PROFILE
+      ? {
+          credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
+        }
+      : {
+          credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+          },
+        }),
   });
 
   try {

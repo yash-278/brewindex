@@ -12,7 +12,9 @@
     "seed": "npx tsx scripts/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1053.0",
     "@aws-sdk/client-s3": "^3.1053.0",
+    "@aws-sdk/credential-providers": "^3.1053.0",
     "@base-ui/react": "^1.5.0",
     "@hono/node-server": "^2.0.4",
     "@octokit/plugin-throttling": "^11.0.3",
