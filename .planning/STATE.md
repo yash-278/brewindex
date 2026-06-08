@@ -1,95 +1,68 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: planning
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-05-26T08:40:29.351Z"
-last_activity: 2026-05-25
+milestone_name: MVP
+status: complete
+stopped_at: Milestone v1.0 archived
+last_updated: "2026-06-08T08:11:26Z"
+last_activity: 2026-06-08
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 20
-  completed_plans: 19
-  percent: 95
+  completed_plans: 20
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-24)
+See: .planning/PROJECT.md (updated 2026-06-08 after v1.0 milestone)
 
 **Core value:** A newcomer can discover, understand, and install any macOS app available via Homebrew without ever needing to know the CLI exists.
-**Current focus:** Phase 03 — search-security
+**Current focus:** v1.0 shipped — planning next milestone
 
 ## Current Position
 
-Phase: 05
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-25
+Phase: All complete
+Plan: N/A
+Status: Milestone v1.0 archived
+Last activity: 2026-06-08
 
-Progress: [██████████] 95%
-
-## Performance Metrics
-
-**Velocity:**
-
-- Total plans completed: 8
-- Average duration: -
-- Total execution time: -
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01 | 5 | - | - |
-| 03 | 3 | - | - |
-
-**Recent Trend:**
-
-- Last 5 plans: -
-- Trend: -
-
-*Updated after each plan completion*
-| Phase 04-discovery-layer P01 | 3min | 2 tasks | 3 files |
-| Phase 04-discovery-layer P03 | 3min | 2 tasks | 4 files |
+Progress: [██████████] 100%
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+See PROJECT.md Key Decisions table for full history.
 
-- Roadmap: 4 coarse phases; data pipeline first, discovery layer last
-- Stack: Next.js App Router + Neon Postgres + Drizzle + Upstash Redis + shadcn/ui + Tailwind v4
-- Icons: Fetch from homepage domain favicon at sync time → Tigris S3 bucket via @aws-sdk/client-s3 (migrated from Vercel Blob in Phase 05.1)
-- ISR: revalidateTag('casks') post-sync, not time-based TTL; top-500 pre-rendered via generateStaticParams
-- Security: CRON_SECRET on sync endpoint; SSRF allowlist on all server-side fetches
+Key decisions from v1.0:
+- Stack: Next.js App Router + Railway Postgres + Drizzle + Tigris S3 + shadcn/ui + Tailwind v4
+- Icons: DuckDuckGo favicon → Tigris S3 via @aws-sdk/client-s3 (migrated from Vercel Blob in Phase 5.1)
+- ISR: revalidateTag('casks') post-sync via /api/revalidate webhook; top-500 pre-rendered
+- Security: CRON_SECRET on sync endpoint; SSRF allowlist (21-entry RFC 1918 block)
+- Infrastructure: Vercel (frontend) + Railway (backend Hono + cron + Postgres)
+- ML categorization: AWS Bedrock Nova Micro (~$0.14 for full catalog)
 
-### Roadmap Evolution
+### Known Gaps (Accepted Tech Debt)
 
-- Phase 5 added: Railway migration — move Vercel functions and Postgres to Railway hobby tier, monorepo strategy
+- **Pagination state loss** (BRWS-02, BRWS-03, BRWS-04): Pagination component discards filter/sort URL params on page navigation. Fix: update `src/components/pagination.tsx` to preserve searchParams when building page links.
+- **Phase 5 not verified**: Railway Migration has no VERIFICATION.md
 
-### Pending Todos
-
-None yet.
-
-### Blockers/Concerns
-
-- Icon sourcing reliability: DuckDuckGo favicon service is not an officially documented production API — validate coverage rate in Phase 2 and keep CSS initials fallback ready from day one
-- generateStaticParams cutoff: Start at top-500 by install count; validate actual Vercel build time in Phase 2 and adjust if needed
-
-## Deferred Items
+### Deferred Items
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| *(none)* | | | |
+| requirements | SRCH-02 (platform filter) | deferred — no platform data in schema | v1.0 planning |
+| requirements | SECU-01 (rate limiting) | deferred — Upstash package present | v1.0 planning |
+| requirements | SECU-02 (WAF rules) | deferred — requires Enterprise plan | v1.0 planning |
+| tech_debt | Pagination state loss (BRWS-02/03/04) | accepted at v1.0 close | 2026-06-08 |
+| tech_debt | Phase 5 not verified | accepted at v1.0 close | 2026-06-08 |
 
 ## Session Continuity
 
-Last session: 2026-05-26T08:40:29.345Z
-Stopped at: Completed 04-03-PLAN.md
-Resume file: None
+Last session: 2026-06-08
+Stopped at: Milestone v1.0 archived
+Resume file: None — start fresh with /gsd-new-milestone for v1.1

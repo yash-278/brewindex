@@ -8,8 +8,8 @@
 ### Browse & Navigation
 
 - [ ] **BRWS-01**: User can browse all Homebrew casks in a visual card grid layout showing name, icon, and short description
-- [ ] **BRWS-02**: User can filter casks by category (Developer Tools, Productivity, Design, etc.)
-- [ ] **BRWS-03**: User can sort the browse grid by popularity (install count), alphabetically, or most recently updated
+- [x] **BRWS-02**: User can filter casks by category (Developer Tools, Productivity, Design, etc.)
+- [x] **BRWS-03**: User can sort the browse grid by popularity (install count), alphabetically, or most recently updated
 - [ ] **BRWS-04**: User can paginate or infinitely scroll through 7,000+ casks without performance degradation
 
 ### Search
@@ -23,7 +23,7 @@
 - [ ] **DETL-02**: User can copy the `brew install --cask <name>` command to clipboard in one click
 - [ ] **DETL-03**: User can see current version and last updated date for a cask
 - [ ] **DETL-04**: User can see 30-day, 90-day, and 365-day install counts for a cask
-- [ ] **DETL-05**: User can see GitHub stars, forks, and open issues for casks that have an upstream GitHub repo
+- [x] **DETL-05**: User can see GitHub stars, forks, and open issues for casks that have an upstream GitHub repo
 
 ### Data Pipeline
 
@@ -94,9 +94,9 @@ Which phases cover which requirements. Confirmed during roadmap creation (2026-0
 | SRCH-02 | Phase 3 | Pending |
 | SECU-01 | Phase 3 | Pending |
 | SECU-02 | Phase 3 | Pending |
-| DETL-05 | Phase 4 | Pending |
-| BRWS-02 | Phase 4 | Pending |
-| BRWS-03 | Phase 4 | Pending |
+| DETL-05 | Phase 4 | Complete |
+| BRWS-02 | Phase 4 | Complete |
+| BRWS-03 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 18 total
